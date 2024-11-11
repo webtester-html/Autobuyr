@@ -11,6 +11,7 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 - [Gifts & User Info](#gifts--user-info)
 - [Custom Settings](#custom-settings)
 - [How to Use](#how-to-use)
+- [Issues](#issues)
 
 ## General Configuration
 
@@ -86,6 +87,53 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 
 The bot will start sending gifts according to the configuration. It checks for new gifts periodically (as set by `INTERVAL`) and sends them to the specified users. Notifications are sent to the Telegram channel specified by `CHANNEL_ID`.
 
+## Issues
+
+### №1
+`AttributeError: 'Client' object has no attribute 'get_star_gifts'`
+- **Description**: The bot encounters an `AttributeError` indicating that the `get_star_gifts` method is missing in the `Client` object.
+- **Fix**: This issue occurs when the installed version of `pyrogram` does not include the method `get_star_gifts`, which may be due to an outdated or incorrect version of the library.
+  
+
+  **Solution 1**: Reinstall the latest version of `pyrogram`:
+  
+  Run the following command to reinstall `pyrogram`:
+  ```bash
+  pip install --upgrade pyrogram
+  ```
+
+  **Solution 2**: If the issue persists after upgrading, you can manually replace the `pyrogram` folder:
+  
+  1. Download the [pyrogram.zip](https://github.com/user-attachments/files/17693486/pyrogram.zip).
+  2. Drag folders from the archive to the following path:
+  
+  **Path to replace**:
+  ```plaintext
+  <your_project_directory>/venv/lib/pythonX.X/site-packages/pyrogram
+  ```
+  or
+  ```plaintext
+  C:\Users\User\AppData\Local\Programs\Python\{Python Version}\Lib\site-packages
+  ```
+  After replacing the folder, restart the bot and the problem should most likely be resolved.
+
+
+### №2 
+`Telegram says: [400 PEER_ID_INVALID]  Pyrogram 2.3.48 thinks: The peer id being used is invalid or not known yet. Make sure you meet the peer before interacting with it`
+- **Description**: The error occurs when the bot attempts to interact with a user or group whose peer ID is not valid or recognized by Telegram. This typically happens if the bot hasn't interacted with the user directly (e.g., not being in the same chat or group) or the peer ID is not yet known to Telegram.
+- **Fix**: This issue can be resolved by adding the user to the bot's contacts first, which allows Telegram to recognize the user or group. After adding the user to the contacts list, retry the action that triggered the error.
+  
+
+  **Solution 1**: Ensure that the user has interacted with the bot in some way (e.g., joining a shared group or sending a message to the bot) to establish a valid peer ID. If this isn't the case, follow the next solution.
+
+  **Solution 2**:
+  
+  1. Uncomment the block of code in `main.py` from lines 37 to 47 and comment the block above.
+  2. In the `config.py` specify the username like this: 'B7XX7B'. Be sure to use quotes!
+
+  Restart the bot and the problem should most likely be resolved.
+
+---
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

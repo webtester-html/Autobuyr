@@ -1,8 +1,3 @@
-
-# ========================
-# Made with ❤️ by @B7XX7B
-# ========================
-
 from pyrogram import Client
 
 import config

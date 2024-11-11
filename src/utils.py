@@ -1,8 +1,3 @@
-
-# ========================
-# Made with ❤️ by @B7XX7B
-# ========================
-
 from datetime import datetime
 
 from pyrogram import Client
@@ -22,22 +17,23 @@ async def buyer(app: Client, chat_id: int, star_gift_id: int, hide_my_name: bool
         user = await app.get_chat(chat_id)
         username = user.username if user.username else ""
 
-        await app.send_star_gift(
-            chat_id=chat_id,
-            star_gift_id=star_gift_id,
-            hide_my_name=hide_my_name
-        )
+        num = config.NUM_GIFTS
+        for _ in range(num):
+            await app.send_star_gift(
+                chat_id=chat_id,
+                star_gift_id=star_gift_id,
+                hide_my_name=hide_my_name
+            )
 
         print(
-            f"\n\033[93m[ ★ ]\033[0m Gift: \033[1m{star_gift_id}\033[0m successfully sent to \033[1m{chat_id} | @{username}\033[0m")
+            f"\n\033[93m[ ★ ]\033[0m - {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}: "
+            f"\033[1m{star_gift_id}\033[0m successfully sent to \033[1m{chat_id} | @{username}\033[0m\n"
+        )
 
         await notifications(app, star_gift_id, user_id=chat_id, username=username)
 
     except RPCError as ex:
-        error_message = (
-            f"<b>Failed to send gift!</b>\n"
-            f"<pre>{str(ex)}</pre>"
-        )
+        error_message = f"<pre>{str(ex)}</pre>"
         if 'BALANCE_TOO_LOW' in str(ex):
             print(f"\n\033[91m[ ERROR ]\033[0m Insufficient stars balance to send gift!")
             await notifications(app, star_gift_id, balance_error=True)

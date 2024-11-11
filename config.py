@@ -6,7 +6,7 @@ from pathlib import Path
 # =======================
 SESSION: str = str(Path(__file__).parent / "data/account")
 API_ID: int = 123
-API_HASH: str = "1234"
+API_HASH: str = "123"
 
 
 # =========================
@@ -14,7 +14,7 @@ API_HASH: str = "1234"
 # =========================
 INTERVAL: float = 5
 TIMEZONE: str = "Europe/Moscow"
-CHANNEL_ID: int = -000
+CHANNEL_ID: int = -1002257786490
 
 # =========================
 # FILE AND DATA PATHS
@@ -26,11 +26,13 @@ DATA_FILEPATH: Path = Path(__file__).parent / "data/history.json"
 # GIFTS | USER INFO
 # =========================
 USER_ID: list[int] = [
-    123, 1234
     # Be sure that both side added to contact each other
+    # U can type usernames, like this: 'B7XX7B'
 ]
 
 MAX_GIFT_PRICE = 100
+
+NUM_GIFTS: int = 2
 
 PURCHASE_NON_LIMITED_GIFTS = True
 
