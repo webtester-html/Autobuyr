@@ -62,6 +62,10 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 ### `GIFT_IDS`
 - **Description**: A list of specific gift IDs that the bot will send. This is optional, and if not specified, all available gifts may be sent.
 
+### `NUM_GIFTS`
+- **Description**: The number of gifts you want the bot to buy. **Same quantity for all gifts!**
+- **Default**: `1`
+
 ## Custom Settings
 
 ### Making adjustments

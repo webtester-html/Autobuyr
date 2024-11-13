@@ -11,10 +11,8 @@ async def new_callback(app: Client, star_gift_raw: dict) -> None:
     gift_price = star_gift_raw.get("price", 0)
 
     if gift_price >= config.MAX_GIFT_PRICE:
-        print("")
         print(
-            f"\033[91m[ ! ]\033[0m Gift: \033[1m{star_gift_raw['id']}\033[0m is too expensive: \033[1m{gift_price}★\033[0m")
-        print("")
+            f"\033[91m[ ! ]\033[0m Gift: \033[1m{star_gift_raw['id']}\033[0m is too expensive: \033[1m{gift_price}★\033[0m\n")
         await notifications(app, star_gift_raw['id'], gift_price=gift_price)
         return
 

@@ -19,7 +19,13 @@ async def notifications(app: Client, star_gift_id: int, gift_price: float = None
     else:
         message = f"<b>🎁 {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}</b> " \
                   f"[<code>{star_gift_id}</code>] has been successfully sent!\n\n" \
-                  f"<b>Recipient:</b> @{username if username else ' '} | <code>{user_id}</code>"
+                  f"<b>Recipient:</b> "
+
+        if username:
+            message += f"@{username} | <code>{user_id}</code>"
+        else:
+            message += f'<a href="tg://user?id={user_id}">{user_id}</a>'
+
     try:
         await app.send_message(config.CHANNEL_ID, message.strip())
     except Exception as ex:
