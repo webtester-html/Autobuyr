@@ -53,7 +53,7 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 
 ### `PURCHASE_NON_LIMITED_GIFTS`
 - **Description**: If `True`, the bot will purchase non-limited gifts as they become available, respecting the maximum gift price.
-- **Default**: `True`
+- **Default**: `False`
 
 ### `HIDE_SENDER_NAME`
 - **Description**: If `True`, the bot will hide its name when sending a gift to a user.
@@ -82,7 +82,7 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
     pip install -r requirements.txt
     ```
 
-4. Edit the `config.py` file to include your API credentials, user IDs, gift IDs, and other relevant settings.
+4. Edit the `.env` file to include your API credentials, user IDs, gift IDs, and other relevant settings.
 5. Run the bot:
 
     ```bash
@@ -122,20 +122,28 @@ The bot will start sending gifts according to the configuration. It checks for n
   After replacing the folder, restart the bot and the problem should most likely be resolved.
 
 
-### №2 
-`Telegram says: [400 PEER_ID_INVALID]  Pyrogram 2.3.48 thinks: The peer id being used is invalid or not known yet. Make sure you meet the peer before interacting with it`
-- **Description**: The error occurs when the bot attempts to interact with a user or group whose peer ID is not valid or recognized by Telegram. This typically happens if the bot hasn't interacted with the user directly (e.g., not being in the same chat or group) or the peer ID is not yet known to Telegram.
-- **Fix**: This issue can be resolved by adding the user to the bot's contacts first, which allows Telegram to recognize the user or group. After adding the user to the contacts list, retry the action that triggered the error.
-  
+[//]: # (### №2 )
 
-  **Solution 1**: Ensure that the user has interacted with the bot in some way (e.g., joining a shared group or sending a message to the bot) to establish a valid peer ID. If this isn't the case, follow the next solution.
+[//]: # (`Telegram says: [400 PEER_ID_INVALID]  Pyrogram 2.3.48 thinks: The peer id being used is invalid or not known yet. Make sure you meet the peer before interacting with it`)
 
-  **Solution 2**:
-  
-  1. Uncomment the block of code in `main.py` from lines 37 to 47 and comment the block above.
-  2. In the `config.py` specify the username like this: 'B7XX7B'. Be sure to use quotes!
+[//]: # (- **Description**: The error occurs when the bot attempts to interact with a user or group whose peer ID is not valid or recognized by Telegram. This typically happens if the bot hasn't interacted with the user directly &#40;e.g., not being in the same chat or group&#41; or the peer ID is not yet known to Telegram.)
 
-  Restart the bot and the problem should most likely be resolved.
+[//]: # (- **Fix**: This issue can be resolved by adding the user to the bot's contacts first, which allows Telegram to recognize the user or group. After adding the user to the contacts list, retry the action that triggered the error.)
+
+[//]: # (  )
+[//]: # ()
+[//]: # (  **Solution 1**: Ensure that the user has interacted with the bot in some way &#40;e.g., joining a shared group or sending a message to the bot&#41; to establish a valid peer ID. If this isn't the case, follow the next solution.)
+
+[//]: # ()
+[//]: # (  **Solution 2**:)
+
+[//]: # (  )
+[//]: # (  1. Uncomment the block of code in `main.py` from lines 37 to 47 and comment the block above.)
+
+[//]: # (  2. In the `.env` specify the username like this: 'B7XX7B'. Be sure to use quotes!)
+
+[//]: # ()
+[//]: # (  Restart the bot and the problem should most likely be resolved.)
 
 ---
 ## License

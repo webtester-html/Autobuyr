@@ -54,7 +54,7 @@ async def detector(app: Client, new_callback: typing.Callable, update_callback: 
         all_star_gifts_amount = len(all_star_gifts_ids)
 
         if new_star_gifts_raw:
-            print(f"\n\n\033[92m[ NEW ]\033[0m New gifts found: {len(new_star_gifts_raw)}\n")
+            print(f"\n\n\033[92m[ NEW ]\033[0m New gifts found: {len(new_star_gifts_raw)}")
 
             for star_gift_id, star_gift_raw in new_star_gifts_raw.items():
                 star_gift_raw["number"] = all_star_gifts_amount - all_star_gifts_ids.index(star_gift_id)
