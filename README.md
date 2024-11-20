@@ -27,7 +27,7 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 
 ### `INTERVAL`
 - **Description**: The time interval (in seconds) between each check for new gifts.
-- **Default**: `5`
+- **Default**: `10` _Set it to at least 10 to avoid connection errors._
 
 ### `TIMEZONE`
 - **Description**: The timezone in which the bot operates. This is used for time-based operations like logging.

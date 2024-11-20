@@ -36,8 +36,8 @@ async def new_callback(app: Client, star_gift_raw: dict) -> None:
         await buyer(app, chat_id, star_gift_raw["id"])
 
 
-async def update_callback(app: Client, old_star_gift_raw: dict, new_star_gift_raw: dict) -> None:
-    if "message_id" not in new_star_gift_raw:
+async def update_callback(app: Client, old_star_gift_raw: dict, new_gift_raw: dict) -> None:
+    if "message_id" not in new_gift_raw:
         return
 
-    message_id = new_star_gift_raw["message_id"]
+    message_id = new_gift_raw["message_id"]

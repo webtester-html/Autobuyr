@@ -1,6 +1,7 @@
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 # =========================
 # LOAD .env VARIABLES
@@ -25,9 +26,6 @@ CHANNEL_ID: int = int(os.getenv("CHANNEL_ID"))
 # =========================
 # GIFTS | USER INFO
 # =========================
-
-# USER_ID: list[str] = list(map(str, os.getenv("USER_ID").split(',')))
-# USER_ID: list[int] = list(map(int, os.getenv("USER_ID").split(',')))
 
 USER_ID = []
 user_ids = os.getenv("USER_ID", "").split(',')

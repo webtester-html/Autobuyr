@@ -1,9 +1,6 @@
 import asyncio
-import os
-import sys
 import traceback
 
-import pyfiglet
 from pyrogram import Client
 from pyrogram.errors.exceptions import RPCError
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -11,18 +8,14 @@ from pytz import timezone as _timezone
 
 import config
 from src import utils
+from src.banner import title, info, cmd
 from src.callbacks import update_callback, new_callback
 from src.detector import detector
 from src.utils import buyer
 
-title_text = "Gifts Buyer by @B7XX7B"
-if os.name == 'nt':
-    os.system(f"title {title_text}")
-else:
-    sys.stdout.write(f"\x1b]2;{title_text}\x07")
-
-title = pyfiglet.figlet_format("Gifts Buyer", font="slant")
-print(title.center(80))
+app_info = info()
+cmd(app_info)
+title(app_info)
 
 sent_gift_ids = set()
 timezone = _timezone(config.TIMEZONE)
@@ -63,7 +56,7 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        current_time = utils.current_datetime(timezone)
+        current_time = utils.time(timezone)
         print(f"\n\n\033[91m[ INFO ]\033[0m \033[1mProgram terminated\033[0m - {current_time}")
     except Exception as ex:
         print(f"\n\n\033[91m[ ERROR ]\033[0m An unexpected error occurred:")

@@ -7,7 +7,7 @@ from pytz.tzinfo import BaseTzInfo
 import config
 
 
-def current_datetime(timezone: BaseTzInfo) -> str:
+def time(timezone: BaseTzInfo) -> str:
     return datetime.now().astimezone(timezone).strftime("%d/%m/%y at %H:%M:%S")
 
 
@@ -25,11 +25,16 @@ async def buyer(app: Client, chat_id: int, star_gift_id: int, hide_my_name: bool
                 hide_my_name=hide_my_name
             )
 
+        recipient_info = (
+            f"@{username.strip()}"
+            if username
+            else f"{chat_id}" if str(chat_id)[0].isdigit()
+            else f"@{str(chat_id).strip()}"
+        )
+
         print(
-            f"\n\033[93m[ ★ ]\033[0m - {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}: "
-            f"\033[1m{star_gift_id}\033[0m successfully sent to \033[1m{chat_id}\033[0m"
-            + (f" | @{username}\033[0m" if username else "")
-            + "\n"
+            f"\033[93m[ ★ ]\033[0m {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}: "
+            f"\033[1m{star_gift_id}\033[0m successfully sent to \033[1m{recipient_info}\033[0m\n"
         )
 
         await notifications(app, star_gift_id, user_id=chat_id, username=username)
@@ -42,8 +47,6 @@ async def buyer(app: Client, chat_id: int, star_gift_id: int, hide_my_name: bool
         elif 'STARGIFT_USAGE_LIMITED' in str(ex):
             print(f"\033[91m[ ERROR ]\033[0m Limited gift: {star_gift_id}) Out of Stock.\n")
             await notifications(app, star_gift_id, USAGE_LIMITED=True)
-            expired_gift_ids.add(star_gift_id)
-            raise
         else:
             print(
                 f"\n\033[91m[ ERROR ]\033[0m Failed to send gift: \033[1m{star_gift_id}\033[0m to user: \033[1m{chat_id}\033[0m\n{str(ex)}\n"

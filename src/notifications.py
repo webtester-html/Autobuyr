@@ -33,8 +33,10 @@ async def notifications(app: Client, star_gift_id: int, gift_price: float = None
 
         if username:
             message += f"@{username} | <code>{user_id}</code>"
-        else:
+        elif str(user_id).isdigit():
             message += f'<a href="tg://user?id={user_id}">{user_id}</a>'
+        else:
+            message += f"@{user_id.strip()}"
 
     try:
         await app.send_message(config.CHANNEL_ID, message.strip())
