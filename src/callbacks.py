@@ -2,7 +2,7 @@ from pyrogram import Client
 
 import config
 from src.notifications import notifications
-from src.utils import buyer
+from utils.utils import buyer
 
 sent_gift_ids = set()
 

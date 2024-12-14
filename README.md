@@ -106,6 +106,10 @@ The bot will start sending gifts according to the configuration. It checks for n
   pip install --upgrade pyrogram
   ```
 
+  ```bash
+  pip install pyrogram[pyrofork]
+  ```
+
   **Solution 2**: If the issue persists after upgrading, you can manually replace the `pyrogram` folder:
   
   1. Download the [pyrogram.zip](https://github.com/user-attachments/files/17693486/pyrogram.zip).

@@ -3,15 +3,14 @@ import traceback
 
 from pyrogram import Client
 from pyrogram.errors.exceptions import RPCError
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pytz import timezone as _timezone
 
 import config
-from src import utils
 from src.banner import title, info, cmd
 from src.callbacks import update_callback, new_callback
-from src.detector import detector
-from src.utils import buyer
+from utils import utils
+from utils.detector import detector
+from utils.utils import buyer
 
 app_info = info()
 cmd(app_info)
@@ -32,14 +31,13 @@ async def main() -> None:
                 try:
                     await app.send_message(
                         chat_id,
-                        "Just a quick check-in! Feel free to ignore this message.",
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [InlineKeyboardButton("Gifts Buyer", url="https://github.com/bohd4nx/TGgifts-buyer")]
-                            ])
+                        "👋 Just a quick check-in! Feel free to ignore this message.\n\n"
+                        "⭐Sent via <a href='https://github.com/bohd4nx/TGgifts-buyer'>Gifts Buyer</a>\n"
+                        "🧑‍💻Developed by @B7XX7B",
+                        disable_web_page_preview=True
                     )
                     await app.get_users(chat_id)
-                    await buyer(app, chat_id, gift_id)
+                    await buyer(app, chat_id, int(gift_id))
                     await asyncio.sleep(3)
                 except RPCError as ex:
                     print(

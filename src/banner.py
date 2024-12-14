@@ -5,7 +5,7 @@ import sys
 import pyfiglet
 
 
-def info(file_path="data/info.json"):
+def info(file_path="data/json/info.json"):
     with open(file_path, "r") as file:
         return json.load(file)
 

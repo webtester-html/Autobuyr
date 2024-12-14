@@ -107,6 +107,10 @@
   pip install --upgrade pyrogram
   ```
 
+  ```bash
+  pip install pyrogram[pyrofork]
+  ```
+
   **Решение 2**: Если проблема сохраняется после обновления, вы можете вручную заменить папку `pyrogram` folder:
   
   1. Скачайте [pyrogram.zip](https://github.com/user-attachments/files/17693486/pyrogram.zip).
