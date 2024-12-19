@@ -3,9 +3,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# =========================
-# LOAD .env VARIABLES
-# =========================
 load_dotenv()
 
 # =======================
@@ -42,3 +39,17 @@ NUM_GIFTS: int = int(os.getenv("NUM_GIFTS"))
 PURCHASE_NON_LIMITED_GIFTS: bool = os.getenv("PURCHASE_NON_LIMITED_GIFTS").lower() == "true"
 HIDE_SENDER_NAME: bool = os.getenv("HIDE_SENDER_NAME").lower() == "true"
 GIFT_IDS: list[int] = os.getenv("GIFT_IDS", "").split(",") if os.getenv("GIFT_IDS") else []
+
+# =========================
+# LOCALE SETTINGS
+# =========================
+LANGUAGE: str = os.getenv("LANGUAGE", "EN").upper()
+LANG_CODES = {
+    "EN": "locales.en",
+    "RU": "locales.ru",
+    "ES": "locales.es",
+    "UK": "locales.uk",
+    "PL": "locales.pl"
+}
+
+locale = __import__(LANG_CODES.get(LANGUAGE, "locales.en"), fromlist=[""])

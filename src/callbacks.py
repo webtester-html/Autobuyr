@@ -9,10 +9,10 @@ sent_gift_ids = set()
 
 async def new_callback(app: Client, star_gift_raw: dict) -> None:
     gift_price = star_gift_raw.get("price", 0)
-
+    locale = config.locale
     if gift_price >= config.MAX_GIFT_PRICE:
         print(
-            f"\033[91m[ ! ]\033[0m Gift: \033[1m{star_gift_raw['id']}\033[0m is too expensive: \033[1m{gift_price}★\033[0m\n"
+            f"\033[91m[ ! ]\033[0m {locale.gift_expensive.format(star_gift_raw['id'], gift_price)}\n"
         )
         await notifications(app, star_gift_raw['id'], gift_price=gift_price)
         return
@@ -27,7 +27,7 @@ async def new_callback(app: Client, star_gift_raw: dict) -> None:
             sent_gift_ids.add(star_gift_raw["id"])
     else:
         print(
-            f"\033[91m[ ! ]\033[0m Gift: \033[1m{star_gift_raw['id']}\033[0m is non-limited. Skipping...\n"
+            f"\033[91m[ ! ]\033[0m {locale.non_limited_gift.format(star_gift_raw['id'])}\n"
         )
         await notifications(app, star_gift_raw['id'], non_limited_error=True)
         return

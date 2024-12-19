@@ -8,32 +8,20 @@ async def notifications(app: Client, star_gift_id: int, gift_price: float = None
                         error_message: str = None, non_limited_error: bool = False,
                         usage_limited: bool = False, peer_id_error: bool = False) -> None:
     num = config.NUM_GIFTS
+    locale = config.locale
 
     if peer_id_error:
-        message = (
-            "<b>❗Error while sending gift!</b>\n\n"
-            "Please make sure the initialization message has been sent successfully, "
-            "you have interacted with this user previously, <b><i>and that you are not sending a gift to yourself!</i></b>\n\n"
-            "⚠️ If nothing helps, try adding them to your contacts or DM the developer: @B7XX7B"
-        )
-
+        message = locale.peer_id_error
     elif error_message:
-        message = f"<b>❗Error while buying a gift!</b>\n\n" \
-                  f"<pre>{error_message}</pre>"
-
+        message = locale.error_message.format(error_message)
     elif balance_error:
-        message = f"<b>🎁 Gift</b> [<code>{star_gift_id}</code>] could not be sent due to insufficient balance!\n" \
-                  f"<b>Please top up your balance to continue sending gifts.</b>"
-
+        message = locale.balance_error.format(star_gift_id)
     elif usage_limited:
-        message = f"<b>❗Limited gift</b> [<code>{star_gift_id}</code>] Out of Stock."
-
+        message = locale.usage_limited.format(star_gift_id)
     elif non_limited_error:
-        message = f"<b>❗Gift</b> [<code>{star_gift_id}</code>] is non-limited. Skipping due to user settings..."
-
+        message = locale.non_limited_error.format(star_gift_id)
     elif gift_price:
-        message = f"<b>🎁 Gift</b> [<code>{star_gift_id}</code>] is too expensive: <b>{gift_price} ⭐</b>. Skipping..."
-
+        message = locale.gift_price.format(star_gift_id, gift_price)
     else:
         message = f"<b>🎁 {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}</b> " \
                   f"[<code>{star_gift_id}</code>] has been successfully sent!\n\n" \
@@ -49,4 +37,4 @@ async def notifications(app: Client, star_gift_id: int, gift_price: float = None
     try:
         await app.send_message(config.CHANNEL_ID, message.strip())
     except Exception as ex:
-        print(f"\n\033[91m[ ERROR ]\033[0m Unexpected error when sending to channel: {str(ex)}")
+        print(f"\n\033[91m[ ERROR ]\033[0m {locale.unexpected_error} {str(ex)}")

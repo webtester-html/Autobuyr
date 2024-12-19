@@ -72,6 +72,60 @@ This user-bot automates the process of sending gifts to users on Telegram. The b
 - You can modify the values of `USER_ID`, `MAX_GIFT_PRICE`, and `PURCHASE_NON_LIMITED_GIFTS` directly in the config file to customize how and to whom the user-bot sends gifts.
 - Set the `PURCHASE_NON_LIMITED_GIFTS` to `False` if you do not want the bot to automatically buy non-limited gifts.
 
+## Localization
+
+### Supported Languages
+The bot supports multiple languages to make it accessible for users around the world. Localization ensures that notifications and messages are sent in the preferred language of the user.
+
+Currently, the bot supports the following languages:
+
+- **English** (`locales/en.py`)
+- **Ukrainian** (`locales/uk.py`)
+- **Russian** (`locales/ru.py`)
+- **Spanish** (`locales/es.py`)
+- **Polish** (`locales/pl.py`)
+
+### Configuration
+Localization is managed through language files located in the `locales/` directory. To change the bot's language, you can modify the `LANGUAGE` setting in the configuration.
+
+Example:
+```python
+LANGUAGE=EN # For English
+```
+
+### How to Add a New Language
+To add a new language, follow these steps:
+1. Create a new file in the `locales/` directory for the new language (e.g., `locales/fr.py` for French).
+2. Define the translations in that file, following the format used in existing language files.
+3. Add the language code to the `LANG_CODES` dictionary in the `config.py` file.
+
+### Language File Example
+
+Here is a basic structure of a language file (e.g., [`locales/en.py`](https://github.com/bohd4nx/TGgifts-buyer/blob/main/locales/en.py):
+
+```python
+# -----------------------------
+# Language Info (English)
+# -----------------------------
+LANG = "🇺🇸 English"
+CODE = "EN-US"
+
+# -----------------------------
+# Telegram Messages
+# -----------------------------
+peer_id_error = ...
+
+error_message = ...
+
+balance_error = ...
+
+usage_limited = ...
+
+non_limited_error = ...
+
+gift_price = ...
+```
+
 ## How to Use
 
 1. Clone or download the repository.
@@ -125,29 +179,6 @@ The bot will start sending gifts according to the configuration. It checks for n
   ```
   After replacing the folder, restart the bot and the problem should most likely be resolved.
 
-
-[//]: # (### №2 )
-
-[//]: # (`Telegram says: [400 PEER_ID_INVALID]  Pyrogram 2.3.48 thinks: The peer id being used is invalid or not known yet. Make sure you meet the peer before interacting with it`)
-
-[//]: # (- **Description**: The error occurs when the bot attempts to interact with a user or group whose peer ID is not valid or recognized by Telegram. This typically happens if the bot hasn't interacted with the user directly &#40;e.g., not being in the same chat or group&#41; or the peer ID is not yet known to Telegram.)
-
-[//]: # (- **Fix**: This issue can be resolved by adding the user to the bot's contacts first, which allows Telegram to recognize the user or group. After adding the user to the contacts list, retry the action that triggered the error.)
-
-[//]: # (  )
-[//]: # ()
-[//]: # (  **Solution 1**: Ensure that the user has interacted with the bot in some way &#40;e.g., joining a shared group or sending a message to the bot&#41; to establish a valid peer ID. If this isn't the case, follow the next solution.)
-
-[//]: # ()
-[//]: # (  **Solution 2**:)
-
-[//]: # (  )
-[//]: # (  1. Uncomment the block of code in `main.py` from lines 37 to 47 and comment the block above.)
-
-[//]: # (  2. In the `.env` specify the username like this: 'B7XX7B'. Be sure to use quotes!)
-
-[//]: # ()
-[//]: # (  Restart the bot and the problem should most likely be resolved.)
 
 ---
 ## License
