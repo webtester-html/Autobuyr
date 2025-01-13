@@ -6,7 +6,8 @@ import config
 async def notifications(app: Client, star_gift_id: int, gift_price: float = None,
                         user_id: int = None, username: str = None, balance_error: bool = False,
                         error_message: str = None, non_limited_error: bool = False,
-                        usage_limited: bool = False, peer_id_error: bool = False) -> None:
+                        current_gift: int = None, usage_limited: bool = False, peer_id_error: bool = False,
+                        total_gifts: int = None, gift_supply: int = None) -> None:
     num = config.NUM_GIFTS
     locale = config.locale
 
@@ -21,11 +22,9 @@ async def notifications(app: Client, star_gift_id: int, gift_price: float = None
     elif non_limited_error:
         message = locale.non_limited_error.format(star_gift_id)
     elif gift_price:
-        message = locale.gift_price.format(star_gift_id, gift_price)
-    else:
-        message = f"<b>🎁 {f'{num} ' if num > 1 else ''}Gift{'s' if num > 1 else ''}</b> " \
-                  f"[<code>{star_gift_id}</code>] has been successfully sent!\n\n" \
-                  f"<b>Recipient:</b> "
+        message = locale.gift_price.format(star_gift_id, gift_price, gift_supply or "N/A")
+    elif current_gift:
+        message = locale.success_message.format(current_gift, num, star_gift_id, '')
 
         if username:
             message += f"@{username} | <code>{user_id}</code>"

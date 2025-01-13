@@ -12,8 +12,7 @@ from utils import utils
 timezone = _timezone(config.TIMEZONE)
 
 
-async def detector(app: Client, new_callback: typing.Callable, update_callback: typing.Callable,
-                   connect_every_loop: bool = True) -> None:
+async def detector(app: Client, new_callback: typing.Callable, connect_every_loop: bool = True) -> None:
     locale = config.locale
     dot = 0
     while True:

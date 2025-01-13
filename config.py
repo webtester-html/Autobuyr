@@ -33,8 +33,11 @@ for user_id in user_ids:
     except ValueError:
         USER_ID.append(user_id)
 
+MIN_GIFT_PRICE: int = int(os.getenv("MIN_GIFT_PRICE"))
 MAX_GIFT_PRICE: int = int(os.getenv("MAX_GIFT_PRICE"))
 NUM_GIFTS: int = int(os.getenv("NUM_GIFTS"))
+GIFT_SUPPLY: int = int(os.getenv("GIFT_SUPPLY")) if os.getenv("GIFT_SUPPLY") else None
+GIFT_DELAY: float = float(os.getenv("GIFT_DELAY"))
 
 PURCHASE_NON_LIMITED_GIFTS: bool = os.getenv("PURCHASE_NON_LIMITED_GIFTS").lower() == "true"
 HIDE_SENDER_NAME: bool = os.getenv("HIDE_SENDER_NAME").lower() == "true"
@@ -47,9 +50,7 @@ LANGUAGE: str = os.getenv("LANGUAGE", "EN").upper()
 LANG_CODES = {
     "EN": "locales.en",
     "RU": "locales.ru",
-    "ES": "locales.es",
     "UK": "locales.uk",
-    "PL": "locales.pl"
 }
 
 locale = __import__(LANG_CODES.get(LANGUAGE, "locales.en"), fromlist=[""])
