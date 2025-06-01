@@ -37,3 +37,4 @@ if __name__ == "__main__":
     except Exception:
         error(t("console.unexpected_error"))
         traceback.print_exc()
+    
