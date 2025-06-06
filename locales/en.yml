@@ -14,10 +14,10 @@ telegram:
     <b>Your current balance:</b> <code>%{balance} ⭐</code>
 
     <b>📝 Gift purchase logic:</b>
-    <blockquote>According to your settings:
+    <blockquote>According to your configured ranges:
     %{ranges}
     
-    • Each matching gift will be sent <b>%{quantity}x</b> times</blockquote>
+    • Format: price range (supply limit) x quantity per gift</blockquote>
 
     💡 Gifts outside the specified criteria will be automatically skipped
 
@@ -38,7 +38,7 @@ telegram:
   available: "Available"
 
 console:
-  low_balance: "Insufficient stars balance to send gift!"
+  low_balance: "Insufficient stars balance to send gift [%{gift_id}]!"
   gift_send_error: "Failed to send gift: %{gift_id} to user: %{chat_id}"
   gift_checking: "Checking for new gifts"
   new_gifts: "New gifts found:"
@@ -46,6 +46,4 @@ console:
   terminated: "Program terminated"
   unexpected_error: "An unexpected error occurred:"
   gift_sent: "Gift (%{current}/%{total}): %{gift_id} successfully sent to %{recipient}"
-  sold_out_gifts_summary: "Skipped %{count} sold out gifts"
-  non_limited_gifts_summary: "Skipped %{count} non-limited gifts"
-  non_upgradable_gifts_summary: "Skipped %{count} non-upgradable gifts"
+  skip_summary: "Skipped gifts summary: sold out: %{sold_out}, non-limited: %{non_limited}, non-upgradable: %{non_upgradable}"

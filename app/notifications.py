@@ -17,7 +17,7 @@ async def send_message(app: Client, message: str) -> None:
 
 
 async def send_notification(app: Client, gift_id: int, **kwargs) -> None:
-    num = config.GIFT_QUANTITY
+    total_gifts = kwargs.get('total_gifts', 1)
 
     supply_text = ""
     if 'total_amount' in kwargs and kwargs['total_amount'] > 0:
@@ -33,7 +33,7 @@ async def send_notification(app: Client, gift_id: int, **kwargs) -> None:
                                  price=kwargs.get('gift_price'),
                                  supply=kwargs.get('total_amount'),
                                  supply_text=supply_text),
-        'success_message': lambda: t("telegram.success_message", current=kwargs.get('current_gift'), total=num,
+        'success_message': lambda: t("telegram.success_message", current=kwargs.get('current_gift'), total=total_gifts,
                                      gift_id=gift_id, recipient='') +
                                    format_user_reference(kwargs.get('user_id'), kwargs.get('username'))
     }
@@ -47,16 +47,15 @@ async def send_notification(app: Client, gift_id: int, **kwargs) -> None:
 async def send_start_message(client: Client) -> None:
     balance = await get_user_balance(client)
     ranges_text = "\n".join([
-        f"• {r['min_price']}-{r['max_price']} ⭐ (supply ≤ {r['supply_limit']})"
-        for r in config.PRICE_RANGES
+        f"• {r['min_price']}-{r['max_price']} ⭐ (supply ≤ {r['supply_limit']}) x{r['quantity']}"
+        for r in config.GIFT_RANGES
     ])
 
     message = t("telegram.start_message",
                 language=config.language_display,
                 locale=config.LANGUAGE,
                 balance=balance,
-                ranges=ranges_text,
-                quantity=config.GIFT_QUANTITY)
+                ranges=ranges_text)
     await send_message(client, message)
 
 

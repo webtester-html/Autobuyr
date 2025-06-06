@@ -18,34 +18,34 @@ class GiftFilter:
         is_upgradable = "upgrade_price" in gift_data
         total_amount = gift_data.get("total_amount", 0) if is_limited else 0
 
-        validation_rules = [
-            {
+        validation_rules = {
+            'sold_out': {
                 'condition': is_sold_out,
                 'return_data': {}
             },
-            {
+            'non_limited': {
                 'condition': not is_limited and not config.PURCHASE_NON_LIMITED_GIFTS,
                 'return_data': {}
             },
-            {
+            'non_upgradable': {
                 'condition': config.PURCHASE_ONLY_UPGRADABLE_GIFTS and not is_upgradable,
                 'return_data': {}
-            },
-            {
-                'condition': is_limited and not config.get_matching_range(gift_price, total_amount),
-                'return_data': {
-                    "range_error": True,
-                    "gift_price": gift_price,
-                    "total_amount": total_amount
-                }
             }
-        ]
+        }
 
-        for rule in validation_rules:
+        for rule in validation_rules.values():
             if rule['condition']:
                 return False, rule['return_data']
 
-        return True, {}
+        range_matched, quantity = config.get_matching_range(gift_price, total_amount)
+        if not range_matched:
+            return False, {
+                "range_error": True,
+                "gift_price": gift_price,
+                "total_amount": total_amount
+            }
+
+        return True, {"quantity": quantity}
 
 
 async def new_callback(app: Client, gift_data: Dict[str, Any]) -> None:
@@ -57,9 +57,11 @@ async def new_callback(app: Client, gift_data: Dict[str, Any]) -> None:
             await send_notification(app, gift_id, **notification_kwargs)
         return
 
+    quantity = notification_kwargs.get("quantity", 1)
+
     for user_id in config.USER_ID:
         try:
-            await buy_gift(app, user_id, gift_id)
+            await buy_gift(app, user_id, gift_id, quantity)
         except Exception as ex:
             warn(t("console.purchase_error", gift_id=gift_id, chat_id=user_id))
             await send_notification(app, gift_id, error_message=str(ex))

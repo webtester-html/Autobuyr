@@ -1,7 +1,7 @@
 import asyncio
 import json
 import time
-from typing import Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 from pyrogram import Client, types
 
@@ -32,6 +32,16 @@ async def get_current_gifts(app: Client) -> Tuple[Dict[int, dict], List[int]]:
     return gifts_dict, list(gifts_dict.keys())
 
 
+def categorize_gift_skips(gift_data: Dict[str, Any]) -> Dict[str, int]:
+    skip_categories = {
+        'sold_out_count': gift_data.get("is_sold_out", False),
+        'non_limited_count': not gift_data.get("is_limited") and not config.PURCHASE_NON_LIMITED_GIFTS,
+        'non_upgradable_count': config.PURCHASE_ONLY_UPGRADABLE_GIFTS and "upgrade_price" not in gift_data
+    }
+
+    return {key: 1 if condition else 0 for key, condition in skip_categories.items()}
+
+
 async def detector(app: Client, callback: Callable) -> None:
     dot_count = 0
 
@@ -55,21 +65,14 @@ async def detector(app: Client, callback: Callable) -> None:
             info(f'{t("console.new_gifts")} {len(new_gifts)}')
 
             total_gifts = len(gift_ids)
-            skip_counts = {
-                'sold_out_count': 0,
-                'non_limited_count': 0,
-                'non_upgradable_count': 0
-            }
+            skip_counts = {'sold_out_count': 0, 'non_limited_count': 0, 'non_upgradable_count': 0}
 
             for gift_id, gift_data in new_gifts.items():
                 gift_data["number"] = total_gifts - gift_ids.index(gift_id)
 
-                if gift_data.get("is_sold_out"):
-                    skip_counts['sold_out_count'] += 1
-                elif not gift_data.get("is_limited") and not config.PURCHASE_NON_LIMITED_GIFTS:
-                    skip_counts['non_limited_count'] += 1
-                elif config.PURCHASE_ONLY_UPGRADABLE_GIFTS and "upgrade_price" not in gift_data:
-                    skip_counts['non_upgradable_count'] += 1
+                gift_skips = categorize_gift_skips(gift_data)
+                for key, value in gift_skips.items():
+                    skip_counts[key] += value
 
             sorted_gifts = sorted(new_gifts.items(), key=lambda x: x[1]["number"])
 
@@ -83,6 +86,12 @@ async def detector(app: Client, callback: Callable) -> None:
                 await callback(app, gift_data)
 
             await send_summary_message(app, **skip_counts)
+
+            if any(skip_counts.values()):
+                info(t("console.skip_summary",
+                       sold_out=skip_counts['sold_out_count'],
+                       non_limited=skip_counts['non_limited_count'],
+                       non_upgradable=skip_counts['non_upgradable_count']))
 
         await save_gifts(list(current_gifts.values()))
         await asyncio.sleep(config.INTERVAL)

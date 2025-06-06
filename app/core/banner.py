@@ -33,5 +33,18 @@ def display_title(app_info: dict, language: str):
 
 def set_window_title(app_info: dict):
     title_text = f"{app_info['title']} by @{app_info['publisher']['contact']['telegram'][13:]}"
-    if os.name == 'nt':
-        os.system(f"title {title_text}")
+
+    os_handlers = {
+        'windows': lambda: os.name == 'nt',
+        'other': lambda: True
+    }
+
+    title_actions = {
+        'windows': lambda: os.system(f"title {title_text}"),
+        'other': lambda: None
+    }
+
+    for os_key, os_func in os_handlers.items():
+        if os_func():
+            title_actions[os_key]()
+            break
