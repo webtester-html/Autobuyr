@@ -1,7 +1,7 @@
 import configparser
 import sys
 from pathlib import Path
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Any
 
 from app.utils.localization import localization
 from app.utils.logger import error
@@ -18,9 +18,7 @@ class Config:
 
     def _load_config(self) -> None:
         config_file = Path('config.ini')
-        if not config_file.exists():
-            error("Configuration file 'config.ini' not found!")
-            sys.exit(1)
+        config_file.exists() or self._exit_with_error("Configuration file 'config.ini' not found!")
         self.parser.read(config_file, encoding='utf-8')
 
     def _setup_paths(self) -> None:
@@ -37,9 +35,7 @@ class Config:
         self.INTERVAL = self.parser.getfloat('Bot', 'INTERVAL', fallback=15.0)
         self.LANGUAGE = self.parser.get('Bot', 'LANGUAGE', fallback='EN').lower()
 
-        self.USER_ID = self._parse_recipients()
         self.GIFT_RANGES = self._parse_gift_ranges()
-        self.PURCHASE_NON_LIMITED_GIFTS = self.parser.getboolean('Gifts', 'PURCHASE_NON_LIMITED_GIFTS', fallback=False)
         self.PURCHASE_ONLY_UPGRADABLE_GIFTS = self.parser.getboolean('Gifts', 'PURCHASE_ONLY_UPGRADABLE_GIFTS',
                                                                      fallback=False)
         self.PRIORITIZE_LOW_SUPPLY = self.parser.getboolean('Gifts', 'PRIORITIZE_LOW_SUPPLY', fallback=False)
@@ -47,114 +43,133 @@ class Config:
     def _parse_channel_id(self) -> Union[int, str, None]:
         channel_value = self.parser.get('Telegram', 'CHANNEL_ID', fallback='').strip()
 
-        channel_validators = {
-            'empty_or_default': lambda val: not val or val == '-100',
-            'username_with_at': lambda val: val.startswith('@'),
-            'numeric_id': lambda val: val.isdigit(),
-            'username_without_at': lambda val: val and not val.startswith('@') and not val.isdigit()
-        }
-
-        channel_handlers = {
-            'empty_or_default': lambda: None,
-            'username_with_at': lambda: channel_value,
-            'numeric_id': lambda: int(channel_value) if int(channel_value) != 0 else None,
-            'username_without_at': lambda: f"@{channel_value}"
-        }
-
-        for validator_key, validator_func in channel_validators.items():
-            if validator_func(channel_value):
-                try:
-                    return channel_handlers[validator_key]()
-                except (ValueError, TypeError):
-                    return None
-
-        return None
-
-    def _parse_recipients(self) -> List[Union[int, str]]:
-        raw_ids = self.parser.get('Gifts', 'USER_ID', fallback='').split(',')
-        recipients = []
-
-        for user_id in raw_ids:
-            user_id = user_id.strip()
-            if not user_id:
-                continue
-
-            recipient_processors = {
-                'username_with_at': {
-                    'condition': lambda uid: uid.startswith('@'),
-                    'handler': lambda uid: uid[1:]
-                },
-                'numeric_id': {
-                    'condition': lambda uid: uid.isdigit(),
-                    'handler': lambda uid: int(uid)
-                },
-                'username_without_at': {
-                    'condition': lambda uid: not uid.startswith('@') and not uid.isdigit(),
-                    'handler': lambda uid: uid
-                }
+        channel_processors = {
+            'empty_or_default': {
+                'condition': lambda val: not val or val == '-100',
+                'handler': lambda: None
+            },
+            'username_with_at': {
+                'condition': lambda val: val.startswith('@'),
+                'handler': lambda: channel_value
+            },
+            'negative_channel_id': {
+                'condition': lambda val: val.startswith('-') and val[1:].isdigit(),
+                'handler': lambda: int(channel_value)
+            },
+            'numeric_id': {
+                'condition': lambda val: val.isdigit(),
+                'handler': lambda: int(channel_value) or None
+            },
+            'username_fallback': {
+                'condition': lambda: True,
+                'handler': lambda: f"@{channel_value}"
             }
+        }
 
-            for processor in recipient_processors.values():
-                if processor['condition'](user_id):
-                    try:
-                        recipients.append(processor['handler'](user_id))
-                    except ValueError:
-                        recipients.append(user_id)
-                    break
+        return self._process_with_handlers(channel_value, channel_processors)
 
-        return recipients
-
-    def _parse_gift_ranges(self) -> List[Dict[str, int]]:
+    def _parse_gift_ranges(self) -> List[Dict[str, Any]]:
         ranges_str = self.parser.get('Gifts', 'GIFT_RANGES', fallback='')
         ranges = []
 
         for range_item in ranges_str.split(','):
             range_item = range_item.strip()
-            if not range_item:
-                continue
+            range_item and ranges.append(self._parse_single_range(range_item))
 
-            try:
-                price_part, rest = range_item.split(':')
-                supply_part, quantity_part = rest.strip().split(' x ')
+        return [r for r in ranges if r]
 
-                min_price, max_price = map(int, price_part.strip().split('-'))
-                supply_limit = int(supply_part.strip())
-                quantity = int(quantity_part.strip())
+    def _parse_single_range(self, range_item: str) -> Dict[str, Any]:
+        try:
+            price_part, rest = range_item.split(':', 1)
+            supply_qty_part, recipients_part = rest.strip().split(':', 1)
+            supply_part, quantity_part = supply_qty_part.strip().split(' x ')
 
-                ranges.append({
-                    'min_price': min_price,
-                    'max_price': max_price,
-                    'supply_limit': supply_limit,
-                    'quantity': quantity
-                })
-            except (ValueError, IndexError):
-                error(f"Invalid gift range format: {range_item}")
-                continue
+            min_price, max_price = map(int, price_part.strip().split('-'))
+            supply_limit = int(supply_part.strip())
+            quantity = int(quantity_part.strip())
+            recipients = self._parse_recipients_list(recipients_part.strip())
 
-        return ranges
+            return {
+                'min_price': min_price,
+                'max_price': max_price,
+                'supply_limit': supply_limit,
+                'quantity': quantity,
+                'recipients': recipients
+            }
+        except (ValueError, IndexError):
+            error(f"Invalid gift range format: {range_item}")
+            return {}
 
-    def get_matching_range(self, price: int, total_amount: int) -> tuple[bool, int]:
-        for range_config in self.GIFT_RANGES:
-            if (range_config['min_price'] <= price <= range_config['max_price'] and
-                    total_amount <= range_config['supply_limit']):
-                return True, range_config['quantity']
-        return False, 0
+    def _parse_recipients_list(self, recipients_str: str) -> List[Union[int, str]]:
+        recipients = []
 
-    def _validate(self) -> None:
-        validation_checks = {
-            "Telegram > API_ID": self.API_ID == 0,
-            "Telegram > API_HASH": not self.API_HASH,
-            "Telegram > PHONE_NUMBER": not self.PHONE_NUMBER,
-            "Gifts > USER_ID": not self.USER_ID,
-            "Gifts > GIFT_RANGES": not self.GIFT_RANGES,
+        for recipient in recipients_str.split(','):
+            recipient = recipient.strip()
+            recipient and recipients.append(self._parse_single_recipient(recipient))
+
+        return [r for r in recipients if r is not None]
+
+    def _parse_single_recipient(self, recipient: str) -> Union[int, str, None]:
+        recipient_processors = {
+            'username_with_at': {
+                'condition': lambda uid: uid.startswith('@'),
+                'handler': lambda uid: uid[1:]
+            },
+            'numeric_id': {
+                'condition': lambda uid: uid.isdigit(),
+                'handler': lambda uid: int(uid)
+            },
+            'username_without_at': {
+                'condition': lambda: True,
+                'handler': lambda uid: uid
+            }
         }
 
-        invalid_fields = [field for field, is_invalid in validation_checks.items() if is_invalid]
-        if invalid_fields:
-            error_msg = localization.translate("errors.missing_config").format(
-                '\n'.join(f'- {field}' for field in invalid_fields))
-            error(error_msg)
-            sys.exit(1)
+        return self._process_with_handlers(recipient, recipient_processors)
+
+    @staticmethod
+    def _process_with_handlers(value: str, processors: Dict) -> Any:
+        for processor in processors.values():
+            condition_func = processor['condition']
+            try:
+                condition_result = condition_func(value) if callable(condition_func) else condition_func()
+                condition_result and processor['handler'](value) if 'handler' in processor else processor['handler']()
+                return processor['handler'](value) if condition_result and 'handler' in processor else (
+                    processor['handler']() if condition_result else None)
+            except (ValueError, TypeError):
+                continue
+        return None
+
+    def get_matching_range(self, price: int, total_amount: int) -> tuple[bool, int, List[Union[int, str]]]:
+        matching_ranges = [
+            (range_config['quantity'], range_config['recipients'])
+            for range_config in self.GIFT_RANGES
+            if (range_config['min_price'] <= price <= range_config['max_price'] and
+                total_amount <= range_config['supply_limit'])
+        ]
+
+        return (True, *matching_ranges[0]) if matching_ranges else (False, 0, [])
+
+    def _validate(self) -> None:
+        validation_rules = {
+            "Telegram > API_ID": lambda: self.API_ID == 0,
+            "Telegram > API_HASH": lambda: not self.API_HASH,
+            "Telegram > PHONE_NUMBER": lambda: not self.PHONE_NUMBER,
+            "Gifts > GIFT_RANGES": lambda: not self.GIFT_RANGES,
+        }
+
+        invalid_fields = [field for field, check in validation_rules.items() if check()]
+        invalid_fields and self._exit_with_validation_error(invalid_fields)
+
+    @staticmethod
+    def _exit_with_error(message: str) -> None:
+        error(message)
+        sys.exit(1)
+
+    def _exit_with_validation_error(self, invalid_fields: List[str]) -> None:
+        error_msg = localization.translate("errors.missing_config").format(
+            '\n'.join(f'- {field}' for field in invalid_fields))
+        self._exit_with_error(error_msg)
 
     @property
     def language_display(self) -> str:

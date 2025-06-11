@@ -2,155 +2,176 @@
 
 <img src="https://github.com/user-attachments/assets/a8d750d3-500c-4372-9733-3bbd509643e8" alt="Program Preview" width="100%" />
 
-An automated Telegram userbot that purchases new gifts as they become available in the Telegram store. The bot can
-handle both limited and non-limited gifts with flexible configuration options and intelligent prioritization.
+Advanced Telegram userbot for automated gift purchasing with intelligent prioritization, multiple recipients support,
+and comprehensive balance management.
 
 > 🌐 [Русская версия документации](README-RU.md)
 
-## 📋 Features
+## ✨ Key Features
 
-- **Automated Gift Detection**: Continuously monitors for new gifts in the Telegram store
-- **Smart Prioritization**: Prioritize gifts with low supply that match your price ranges
-- **Unified Range Configuration**: Define price ranges, supply limits, and quantities in one elegant format
-- **Multiple Recipients**: Send gifts to one or more users with flexible ID/username support
-- **Notification System**: Get updates on purchases through a designated Telegram channel
-- **Advanced Filtering**: Choose to buy only limited or upgradable gifts
-- **Multi-language Support**: Available in English and Russian
+- **🤖 Smart Automation**: Continuous monitoring with intelligent gift detection
+- **🎯 Advanced Prioritization**: Automatically prioritizes low-supply gifts matching your ranges
+- **👥 Multi-Recipient Support**: Send different quantities to multiple users/channels per range
+- **💰 Smart Balance Management**: Partial purchases when balance insufficient, prevents failed transactions
+- **📊 Comprehensive Notifications**: Detailed purchase reports, balance alerts, and processing summaries
+- **🔧 Flexible Configuration**: Unified range format with price, supply, quantity, and recipient controls
+- **🌍 Multi-Language**: Full English and Russian support
+- **📝 Session Management**: Continue from last session or start fresh
 
-## 🛠️ Installation
+## 🚀 Quick Start
 
-### Setup Steps
-
-1. Clone the repository (or download zip):
-
+1. **Clone & Install**:
    ```bash
    git clone https://github.com/bohd4nx/Gifts-Buyer.git
    cd Gifts-Buyer
-   ```
-
-2. Install the required dependencies:
-
-   ```bash
    pip install -r requirements.txt
    ```
 
-3. Configure the application:
-   - Edit the `config.ini` file with your API credentials
-   - Set your preferred gift purchasing parameters
+2. **Configure**: Edit `config.ini` with your credentials and preferences
+
+3. **Run**: `python main.py`
 
 ## ⚙️ Configuration
 
-Open `config.ini` and configure the following sections:
-
-### Telegram API Settings
+### Essential Settings
 
 ```ini
 [Telegram]
-API_ID = your_api_id              # Get from https://my.telegram.org/apps
-API_HASH = your_api_hash          # Get from https://my.telegram.org/apps
-PHONE_NUMBER = +1234567890        # Your phone number in international format
+API_ID = your_api_id                    # From https://my.telegram.org/apps
+API_HASH = your_api_hash               # From https://my.telegram.org/apps
+PHONE_NUMBER = +1234567890             # International format
+CHANNEL_ID = @notifications            # Channel for updates (-100 to disable)
 
-# Channel for notifications - supports multiple formats:
-CHANNEL_ID = -1001234567890       # Channel ID (numeric) or @usernamw
-```
-
-### Bot Behavior
-
-```ini
 [Bot]
-INTERVAL = 10     # Check interval in seconds (recommended: 5-15)
-LANGUAGE = EN     # Interface language (EN or RU)
+INTERVAL = 10                          # Check frequency (seconds)
+LANGUAGE = EN                          # Interface language (EN/RU)
+
+[Gifts]
+# Unified format: price_range: supply_limit x quantity: recipients
+GIFT_RANGES = 1-1000: 500000 x 1: @user1, 123456, 1001-5000: 100000 x 2: @channel
+
+PURCHASE_NON_LIMITED_GIFTS = False     # Buy unlimited gifts
+PURCHASE_ONLY_UPGRADABLE_GIFTS = False # Only upgradable gifts
+PRIORITIZE_LOW_SUPPLY = True           # Smart supply-based prioritization
 ```
 
-### Gift Preferences
+### Advanced Range Configuration
+
+**Unified Format**: `min_price-max_price: supply_limit x quantity: recipients`
+
+**Real Examples**:
+
+- `1-1000: 500000 x 1: @johndoe, 123456789` - Cheap gifts, 1 copy each
+- `1001-5000: 100000 x 2: @premium_channel, @vip_user` - Mid-range, 2 copies each
+- `5001-50000: 50000 x 5: 987654321` - Expensive gifts, 5 copies to specific user
+
+**Smart Features**:
+
+- **Channel Support**: Gift directly to channels using `@channelname`
+- **Mixed Recipients**: Combine usernames, IDs, and channels freely
+- **Per-Range Logic**: Different strategies for different price tiers
+- **Quantity Control**: Specify exact amounts per range
+
+### Intelligent Prioritization
+
+With `PRIORITIZE_LOW_SUPPLY = True`:
+
+1. **Priority Queue**: Gifts matching ranges, sorted by supply (lowest first)
+2. **Smart Timing**: Processes rarest gifts immediately
+3. **Range Optimization**: Focuses on your configured targets
+
+**Example Scenario**:
+
+```
+Gift A: 2500⭐, 25K supply, quantity=3  ← Processed first (lowest supply)
+Gift B: 1800⭐, 150K supply, quantity=1 ← Processed second  
+Gift C: 15000⭐, 5K supply             ← Skipped (outside ranges)
+```
+
+## 🧠 Smart Balance Management
+
+**Intelligent Purchase Logic**:
+
+- **Pre-Check**: Calculates maximum affordable quantity before purchase
+- **Partial Buying**: Buys what's possible, reports shortfall
+- **No Failed Attempts**: Prevents unnecessary API calls and errors
+- **Detailed Reporting**: Shows purchased vs requested quantities
+
+**Example**:
+
+```
+Config: Buy 4 copies of 1500⭐ gift
+Balance: 4500⭐ 
+Result: Buys 3 copies, reports "Missing 1500⭐ for remaining 1 gift"
+```
+
+## 📊 Advanced Monitoring
+
+**Notification Types**:
+
+- ✅ **Success**: Purchase confirmations with recipient details
+- 💰 **Balance**: Insufficient funds alerts with exact requirements
+- 📈 **Partial**: Partial purchase reports with missing amounts
+- 📊 **Summary**: Batch processing statistics
+- ⚠️ **Errors**: Detailed error explanations and solutions
+
+**Processing Intelligence**:
+
+- Real-time balance tracking
+- Supply-based prioritization
+- Automatic range matching
+- Recipient validation
+
+## 🎯 Use Cases
+
+**Conservative Strategy**:
 
 ```ini
-[Gifts]
-# Unified gift ranges with price, supply, and quantity
-GIFT_RANGES = 1-1000: 500000 x 1, 1001-5000: 100000 x 2, 5001-10000: 50000 x 3
-
-# Recipients - supports multiple formats (comma-separated):
-USER_ID = 123456789, @johndoe, username123    # Mix of IDs and usernames
-
-# Purchase filters
-PURCHASE_NON_LIMITED_GIFTS = False      # Whether to buy non-limited gifts
-PURCHASE_ONLY_UPGRADABLE_GIFTS = False  # Buy only upgradable gifts
-
-# Smart prioritization
-PRIORITIZE_LOW_SUPPLY = True            # Prioritize gifts matching ranges with lowest supply first
+GIFT_RANGES = 1-500: 1000000 x 1: @myself
+PRIORITIZE_LOW_SUPPLY = False
 ```
 
-#### Unified Gift Ranges Configuration
+**Aggressive Collector**:
 
-The `GIFT_RANGES` parameter uses an elegant unified format: `min_price-max_price: supply_limit x quantity`
-
-**Examples:**
-
-- `1-1000: 500000 x 1` - Buy gifts priced 1-1000 stars (supply ≤ 500,000) and send 1 copy
-- `1001-5000: 100000 x 2` - Buy gifts priced 1001-5000 stars (supply ≤ 100,000) and send 2 copies
-- `5001-10000: 50000 x 3` - Buy gifts priced 5001-10000 stars (supply ≤ 50,000) and send 3 copies
-
-**Key Features:**
-
-- All ranges are **inclusive** (≤)
-- Different quantities per price range
-- Automatic supply-based filtering
-- Multiple ranges supported (comma-separated)
-
-#### Smart Prioritization
-
-When `PRIORITIZE_LOW_SUPPLY = True`, the bot processes gifts in optimal order:
-
-1. **Priority 1**: Gifts matching your ranges, sorted by lowest supply first
-2. **Priority 2**: Remaining gifts in discovery order
-
-**Example Scenario:**
-
-- Gift A: 2000⭐, 50,000 supply, quantity=2 (matches range, low supply)
-- Gift B: 1500⭐, 200,000 supply, quantity=1 (matches range, high supply)
-- Gift C: 15000⭐, 10,000 supply (doesn't match any range)
-
-**Processing Order:** A (2x) → B (1x) → C (skipped)
-
-## 🚀 Usage
-
-Run the bot with:
-
-```bash
-python main.py
+```ini  
+GIFT_RANGES = 1-2000: 200000 x 3: @main, @backup, 1001-10000: 50000 x 5: @premium
+PRIORITIZE_LOW_SUPPLY = True
 ```
 
-The bot will:
+**Channel Distribution**:
 
-1. Log in to your Telegram account
-2. Start monitoring for new gifts
-3. Purchase gifts matching your ranges with specified quantities
-4. Send notifications through your specified channel
+```ini
+GIFT_RANGES = 1-1000: 500000 x 2: @public_channel, @private_channel, @archive_channel
+```
 
-## 📊 Monitoring & Notifications
+## 🔧 Advanced Features
 
-The bot provides detailed notifications including:
+- **Session Persistence**: Seamless restart capability
+- **Error Recovery**: Automatic retry logic for network issues
+- **Rate Limiting**: Built-in API respect mechanisms
+- **Batch Processing**: Efficient multi-gift handling
+- **Channel Gifting**: Direct channel distribution support
+- **Localization**: Native language support
 
-- ✅ Successful purchases with recipient information and quantities
-- ❌ Failed purchases with error explanations
-- 📊 Processing summaries (skipped gifts breakdown)
-- 💰 Balance notifications for insufficient funds
-- 🎯 Range mismatch notifications
+## 📝 Best Practices
 
-## 📝 Notes & Best Practices
+- **Balance**: Maintain 2-3x your highest range for safety
+- **Ranges**: Use multiple tiers for different strategies
+- **Monitoring**: Enable notifications for real-time updates
+- **Testing**: Start with small ranges to validate configuration
+- **VPS**: Run continuously for competitive advantage
 
-- **Balance Management**: Ensure sufficient stars for multiple quantities per gift
-- **Range Strategy**: Use higher quantities for rarer, more expensive gifts
-- **24/7 Operation**: Run on VPS/server for continuous monitoring
-- **Rate Limiting**: Built-in delays respect Telegram's API limits
-- **Priority Strategy**: Enable `PRIORITIZE_LOW_SUPPLY` for competitive advantage
+## 🆕 Version 2025.7.1 Features
 
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- ✨ **Smart Balance Management**: Partial purchases, no failed transactions
+- 🎯 **Advanced Prioritization**: Supply-based intelligent ordering
+- 👥 **Enhanced Multi-Recipient**: Channel support, flexible formats
+- 📊 **Comprehensive Reporting**: Detailed notifications and summaries
+- 🔧 **Improved Configuration**: Cleaner, more intuitive setup
+- 🌍 **Better Localization**: Full multi-language support
 
 ---
 
 <div align="center">
-    <h4>Built with ❤️ by <a href="https://t.me/bohd4nx" target="_blank">Bohdan</a></h4>
+    <h4>🚀 Built with ❤️ by <a href="https://t.me/bohd4nx">@bohd4nx</a> • ⭐ Star on <a href="https://github.com/bohd4nx/Gifts-Buyer">GitHub</a></h4>
 </div>

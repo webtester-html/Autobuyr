@@ -47,3 +47,7 @@ console:
   unexpected_error: "Произошла непредвиденная ошибка:"
   gift_sent: "Подарок (%{current}/%{total}): %{gift_id} успешно отправлен %{recipient}"
   skip_summary: "Сводка пропущенных подарков: распроданных: %{sold_out}, нелимитированных: %{non_limited}, неулучшаемых: %{non_upgradable}"
+  processing_gift: "Обрабатываем подарок [%{gift_id}] количество: %{quantity} получателей: %{recipients_count}"
+  insufficient_balance_for_quantity: "Недостаточно баланса для покупки %{requested} подарков [%{gift_id}] по %{price}⭐. Баланс: %{balance}⭐"
+  partial_purchase: "Частичная покупка [%{gift_id}]: куплено %{purchased}/%{requested}, не хватает %{remaining_needed}⭐ (баланс: %{current_balance}⭐)"
+  fresh_start: "Запуск с чистого листа - все текущие подарки будут считаться новыми"

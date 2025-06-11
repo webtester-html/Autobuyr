@@ -15,8 +15,7 @@ class SimpleFormatter(logging.Formatter):
 
 class CustomLogger(logging.Logger):
     def success(self, msg, *args, **kwargs):
-        if self.isEnabledFor(SUCCESS_LEVEL):
-            self._log(SUCCESS_LEVEL, msg, args, **kwargs)
+        self.isEnabledFor(SUCCESS_LEVEL) and self._log(SUCCESS_LEVEL, msg, args, **kwargs)
 
 
 logging.setLoggerClass(CustomLogger)
@@ -29,29 +28,35 @@ handler.setFormatter(SimpleFormatter('%(levelname)s %(message)s'))
 logger.addHandler(handler)
 
 
-def info(message: str) -> None:
-    print("\r", end="")
-    logger.info(message)
+class LoggerInterface:
+    @staticmethod
+    def info(message: str) -> None:
+        print("\r", end="")
+        logger.info(message)
+
+    @staticmethod
+    def warn(message: str) -> None:
+        print("\r", end="")
+        logger.warning(message)
+
+    @staticmethod
+    def error(message: str) -> None:
+        print("\r", end="")
+        logger.error(message)
+
+    @staticmethod
+    def success(message: str) -> None:
+        print("\r", end="")
+        logger.success(message) if isinstance(logger, CustomLogger) else logger.info(f"[SUCCESS] {message}")
+
+    @staticmethod
+    def log_same_line(message: str, level: str = "INFO") -> None:
+        timestamp = datetime.datetime.now().strftime("%d.%m.%y %H:%M:%S")
+        print(f"\r[{timestamp}] - [{level.upper()}]: {message}", end="", flush=True)
 
 
-def warn(message: str) -> None:
-    print("\r", end="")
-    logger.warning(message)
-
-
-def error(message: str) -> None:
-    print("\r", end="")
-    logger.error(message)
-
-
-def success(message: str) -> None:
-    print("\r", end="")
-    if isinstance(logger, CustomLogger):
-        logger.success(message)
-    else:
-        logger.info(f"[SUCCESS] {message}")
-
-
-def log_same_line(message: str, level: str = "INFO") -> None:
-    timestamp = datetime.datetime.now().strftime("%d.%m.%y %H:%M:%S")
-    print(f"\r[{timestamp}] - [{level.upper()}]: {message}", end="", flush=True)
+info = LoggerInterface.info
+warn = LoggerInterface.warn
+error = LoggerInterface.error
+success = LoggerInterface.success
+log_same_line = LoggerInterface.log_same_line

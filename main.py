@@ -13,25 +13,30 @@ from data.config import config, t, get_language_display
 app_info = get_app_info()
 
 
-async def main() -> None:
-    set_window_title(app_info)
-    display_title(app_info, get_language_display(config.LANGUAGE))
+class Application:
+    @staticmethod
+    async def run() -> None:
+        set_window_title(app_info)
+        display_title(app_info, get_language_display(config.LANGUAGE))
 
-    async with Client(
-            name=config.SESSION,
-            api_id=config.API_ID,
-            api_hash=config.API_HASH,
-            phone_number=config.PHONE_NUMBER
-    ) as client:
-        await send_start_message(client)
-        await detector(client, new_callback)
+        async with Client(
+                name=config.SESSION,
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                phone_number=config.PHONE_NUMBER
+        ) as client:
+            await send_start_message(client)
+            await detector(client, new_callback)
+
+    @staticmethod
+    def main() -> None:
+        try:
+            asyncio.run(Application.run())
+        except KeyboardInterrupt:
+            info(t("console.terminated"))
+        except Exception:
+            error(t("console.unexpected_error"))
+            traceback.print_exc()
 
 
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        info(t("console.terminated"))
-    except Exception:
-        error(t("console.unexpected_error"))
-        traceback.print_exc()
+Application.main() if __name__ == "__main__" else None
