@@ -31,6 +31,13 @@ Edit `config.ini` with your settings and run:
 python main.py
 ```
 
+Or you can run docker container:
+
+```bash
+docker compose up --build -d
+```
+
+
 ## ⚙️ Configuration
 
 ### Basic Settings
