@@ -43,30 +43,21 @@ class Config:
     def _parse_channel_id(self) -> Union[int, str, None]:
         channel_value = self.parser.get('Telegram', 'CHANNEL_ID', fallback='').strip()
 
-        channel_processors = {
-            'empty_or_default': {
-                'condition': lambda val: not val or val == '-100',
-                'handler': lambda: None
-            },
-            'username_with_at': {
-                'condition': lambda val: val.startswith('@'),
-                'handler': lambda: channel_value
-            },
-            'negative_channel_id': {
-                'condition': lambda val: val.startswith('-') and val[1:].isdigit(),
-                'handler': lambda: int(channel_value)
-            },
-            'numeric_id': {
-                'condition': lambda val: val.isdigit(),
-                'handler': lambda: int(channel_value) or None
-            },
-            'username_fallback': {
-                'condition': lambda: True,
-                'handler': lambda: f"@{channel_value}"
-            }
-        }
+        # TODO: Rewrite without using if-else blocks, like other functions
 
-        return self._process_with_handlers(channel_value, channel_processors)
+        if not channel_value or channel_value == '-100':
+            return None
+
+        if channel_value.startswith('@'):
+            return channel_value
+
+        if channel_value.startswith('-') and channel_value[1:].isdigit():
+            return int(channel_value)
+
+        if channel_value.isdigit():
+            return int(channel_value)
+
+        return f"@{channel_value}"
 
     def _parse_gift_ranges(self) -> List[Dict[str, Any]]:
         ranges_str = self.parser.get('Gifts', 'GIFT_RANGES', fallback='')

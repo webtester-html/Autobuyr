@@ -1,15 +1,20 @@
-from pyrogram import Client
-from pyrogram.errors import RPCError
-
 from app.utils.helper import get_user_balance, format_user_reference
 from app.utils.logger import error
 from data.config import config, t
+from pyrogram import Client
+from pyrogram.errors import RPCError
 
 
 class NotificationManager:
     @staticmethod
     async def send_message(app: Client, message: str) -> None:
-        config.CHANNEL_ID and await app.send_message(config.CHANNEL_ID, message, disable_web_page_preview=True)
+        if not config.CHANNEL_ID:
+            return
+
+        try:
+            await app.send_message(config.CHANNEL_ID, message, disable_web_page_preview=True)
+        except RPCError as ex:
+            error(f'Failed to send message to channel {config.CHANNEL_ID}: {str(ex)}')
 
     @staticmethod
     async def send_notification(app: Client, gift_id: int, **kwargs) -> None:

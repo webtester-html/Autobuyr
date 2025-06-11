@@ -3,11 +3,10 @@ import json
 import time
 from typing import Any, Callable, Dict, List, Tuple
 
-from pyrogram import Client, types
-
 from app.notifications import send_summary_message
 from app.utils.logger import log_same_line, info
 from data.config import config, t
+from pyrogram import Client, types
 
 
 class GiftDetector:
@@ -18,7 +17,6 @@ class GiftDetector:
                 return {gift["id"]: gift for gift in json.load(file)}
         except FileNotFoundError:
             return {}
-
 
     @staticmethod
     async def save_gift_history(gifts: List[dict]) -> None:

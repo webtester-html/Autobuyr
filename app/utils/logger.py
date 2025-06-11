@@ -5,6 +5,7 @@ import sys
 SUCCESS_LEVEL = 25
 logging.addLevelName(SUCCESS_LEVEL, "SUCCESS")
 
+# TODO: Simplify logger structure — minimize duplication, streamline level handling, and separate formatting concerns more cleanly
 
 class SimpleFormatter(logging.Formatter):
     def format(self, record):
