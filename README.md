@@ -31,10 +31,38 @@ Edit `config.ini` with your settings and run:
 python main.py
 ```
 
-Or you can run docker container:
+## 🐳 Docker Usage
+
+You can run the bot via Docker. The process includes one-time Telegram authorization and background launch.
+
+### 1. Build the Docker image
 
 ```bash
-docker compose up --build -d
+docker compose build
+```
+
+### 2. Run the container for Telegram login (one-time setup)
+
+```bash
+docker compose run --rm gift-buyer
+```
+
+Follow the prompts to complete Telegram authorization. Your session will be saved in the `./data/` directory.
+
+> ℹ️ This step is only required once — until your session expires or you change accounts.
+
+### 3. Start the bot in background mode
+
+```bash
+docker compose up -d
+```
+
+The bot will start using the saved session and configuration from `config.ini`.
+
+### 4. Stop the bot (when needed)
+
+```bash
+docker compose down
 ```
 
 
