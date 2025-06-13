@@ -55,7 +55,7 @@ LANGUAGE = EN                          # Interface language (EN/RU)
 
 [Gifts]
 # Format: price_range: supply_limit x quantity: recipients
-GIFT_RANGES = 1-1000: 500000 x 1: @user1, 123456, 1001-5000: 100000 x 2: @channel
+GIFT_RANGES = 1-1000: 500000 x 1: @user1, 123456; 1001-5000: 100000 x 2: @channel
 
 PURCHASE_ONLY_UPGRADABLE_GIFTS = False # Buy only upgradable gifts
 PRIORITIZE_LOW_SUPPLY = True           # Prioritize rare gifts
@@ -63,13 +63,17 @@ PRIORITIZE_LOW_SUPPLY = True           # Prioritize rare gifts
 
 ### Gift Ranges Format
 
-**Format**: `min_price-max_price: supply_limit x quantity: recipients`
+**Format**: multiple ranges separated by `;`  
+Each range: `min_price-max_price: supply_limit x quantity: recipients`
 
 **Examples**:
 
 - `1-1000: 500000 x 1: @johndoe, 123456789` - Cheap gifts, 1 copy each
 - `1001-5000: 100000 x 2: @channel, @user` - Mid-range, 2 copies each
 - `5001-50000: 50000 x 5: 987654321` - Expensive gifts, 5 copies
+
+**As a result**:  
+`GIFT_RANGES = 1-1000: 500000 x 1: @johndoe, 123456789; 1001-5000: 100000 x 2: @channel, @user; 5001-50000: 50000 x 5: 987654321`
 
 **Recipients can be**:
 
