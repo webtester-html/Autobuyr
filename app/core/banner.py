@@ -39,6 +39,5 @@ class BannerManager:
 
 
 get_app_info = BannerManager.get_app_info
-create_banner = BannerManager.create_banner
 display_title = BannerManager.display_title
 set_window_title = BannerManager.set_window_title

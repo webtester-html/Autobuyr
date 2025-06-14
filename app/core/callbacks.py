@@ -1,11 +1,12 @@
 import asyncio
 from typing import Dict, Any
 
+from pyrogram import Client
+
 from app.notifications import send_notification
 from app.purchase import buy_gift
 from app.utils.logger import warn, info
 from data.config import config, t
-from pyrogram import Client
 
 
 class GiftProcessor:
@@ -61,4 +62,4 @@ async def _distribute_gifts(app: Client, gift_id: int, quantity: int, recipients
         await asyncio.sleep(0.5)
 
 
-new_callback = process_new_gift
+process_gift = process_new_gift

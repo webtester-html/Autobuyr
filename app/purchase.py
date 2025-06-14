@@ -1,10 +1,11 @@
+from pyrogram import Client
+from pyrogram.errors import RPCError
+
 from app.errors import handle_gift_error
 from app.notifications import send_notification
 from app.utils.helper import get_recipient_info, get_user_balance
-from app.utils.logger import success, warn
+from app.utils.logger import info, warn
 from data.config import t
-from pyrogram import Client
-from pyrogram.errors import RPCError
 
 
 class GiftPurchaser:
@@ -39,7 +40,7 @@ class GiftPurchaser:
             current_gift = i + 1
             try:
                 await app.send_gift(chat_id=chat_id, gift_id=gift_id, hide_my_name=True)
-                success(t("console.gift_sent", current=current_gift, total=quantity,
+                info(t("console.gift_sent", current=current_gift, total=quantity,
                           gift_id=gift_id, recipient=recipient_info))
                 await send_notification(app, gift_id, user_id=chat_id, username=username,
                                         current_gift=current_gift, total_gifts=quantity,

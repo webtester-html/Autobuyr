@@ -4,9 +4,9 @@ import traceback
 from pyrogram import Client
 
 from app.core.banner import display_title, get_app_info, set_window_title
-from app.core.callbacks import new_callback
+from app.core.callbacks import process_gift
 from app.notifications import send_start_message
-from app.utils.detector import detector
+from app.utils.detector import gift_monitoring
 from app.utils.logger import info, error
 from data.config import config, t, get_language_display
 
@@ -26,7 +26,7 @@ class Application:
                 phone_number=config.PHONE_NUMBER
         ) as client:
             await send_start_message(client)
-            await detector(client, new_callback)
+            await gift_monitoring(client, process_gift)
 
     @staticmethod
     def main() -> None:

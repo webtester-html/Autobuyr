@@ -16,7 +16,7 @@ telegram:
     <b>📝 Gift purchase logic:</b>
     <blockquote>According to your configured ranges:
     %{ranges}
-    
+
     • Format: price range (supply limit) x quantity per gift</blockquote>
 
     💡 Gifts outside the specified criteria will be automatically skipped
@@ -24,7 +24,7 @@ telegram:
     @GiftsTracker • @GiftMints | Made with ❤️ by @bohd4nx
   peer_id_error: |
     <b>❗Error while sending gift!</b>
-    
+
     Please make sure the initialization message has been sent successfully 
     and that you have interacted with this user previously.
   error_message: "<b>❗Error while buying a gift!</b>\n\n<pre>%{error}</pre>"
@@ -48,8 +48,5 @@ console:
   gift_sent: "Gift (%{current}/%{total}): %{gift_id} successfully sent to %{recipient}"
   skip_summary: "Skipped gifts summary: sold out: %{sold_out}, non-limited: %{non_limited}, non-upgradable: %{non_upgradable}"
   processing_gift: "Processing gift [%{gift_id}] quantity: %{quantity} recipients: %{recipients_count}"
-  insufficient_balance_for_quantity: "Insufficient balance to buy %{requested} gifts [%{gift_id}] at %{price}⭐. Balance: %{balance}⭐"
   partial_purchase: "Partial purchase [%{gift_id}]: bought %{purchased}/%{requested}, missing %{remaining_needed}⭐ (balance: %{current_balance}⭐)"
-  fresh_start: "Fresh start - all current gifts will be treated as new"
-  history_loaded: "History loaded: %{count} previously discovered gifts"
-  no_history_file: "No history file found - starting fresh"
+  insufficient_balance_for_quantity: "Insufficient balance to buy %{requested} gifts [%{gift_id}] at %{price}⭐. Balance: %{balance}⭐"

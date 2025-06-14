@@ -3,10 +3,11 @@ import json
 import time
 from typing import Any, Callable, Dict, List, Tuple
 
+from pyrogram import Client, types
+
 from app.notifications import send_summary_message
 from app.utils.logger import log_same_line, info
 from data.config import config, t
-from pyrogram import Client, types
 
 
 class GiftDetector:
@@ -105,4 +106,4 @@ class GiftMonitor:
                                              non_upgradable=skip_counts['non_upgradable_count']))
 
 
-detector = GiftMonitor.run_detection_loop
+gift_monitoring = GiftMonitor.run_detection_loop

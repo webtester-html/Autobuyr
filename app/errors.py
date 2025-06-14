@@ -1,10 +1,11 @@
 from typing import Dict, Any
 
+from pyrogram import Client
+from pyrogram.errors import RPCError
+
 from app.notifications import send_notification
 from app.utils.logger import error
 from data.config import t
-from pyrogram import Client
-from pyrogram.errors import RPCError
 
 
 class ErrorHandler:

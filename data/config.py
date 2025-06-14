@@ -175,4 +175,3 @@ config = Config()
 t = localization.translate
 get_language_display = localization.get_display_name
 get_language_code = localization.get_language_code
-get_all_translations = localization.load_all_translations

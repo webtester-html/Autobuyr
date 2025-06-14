@@ -1,6 +1,6 @@
 # Telegram Gifts Buyer
 
-<img src="https://github.com/user-attachments/assets/a8d750d3-500c-4372-9733-3bbd509643e8" alt="Program Preview" width="100%" />
+<img src="https://github.com/user-attachments/assets/40f64ac9-ff84-4b31-85fd-b6ab01116bdb" alt="Program Preview" width="100%" />
 
 Automated Telegram userbot for purchasing gifts with smart prioritization, multiple recipients, and intelligent balance
 management.
@@ -65,7 +65,6 @@ The bot will start using the saved session and configuration from `config.ini`.
 docker compose down
 ```
 
-
 ## ⚙️ Configuration
 
 ### Basic Settings
@@ -75,7 +74,7 @@ docker compose down
 API_ID = your_api_id                   # From https://my.telegram.org/apps
 API_HASH = your_api_hash               # From https://my.telegram.org/apps
 PHONE_NUMBER = +1234567890             # Your phone number
-CHANNEL_ID = @notifications            # Notifications channel (-100 to disable)
+CHANNEL_ID = -100xxxxxxxxx             # Notifications channel (-100 to disable)
 
 [Bot]
 INTERVAL = 10                          # Check interval in seconds
@@ -139,5 +138,5 @@ Example:
 ---
 
 <div align="center">
-    <h4>🚀 Built with ❤️ by <a href="https://t.me/bohd4nx">Bohdan</a></h4>
+    <h4>🚀 Built with ❤️ by <a href="https://t.me/bohd4nx">Bohdan</a> • <a href="https://app.tonkeeper.com/transfer/UQBUAa7KCx1ifmoEy6lF7j-822Dm_cE1j9SR7UWteu3jzukV?amount=0&text=Thanks%20for%20Gifts-Buyer">Donate</a></h4>
 </div>
