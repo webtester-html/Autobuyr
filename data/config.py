@@ -15,11 +15,12 @@ i18n.set('filename_format', '{locale}.{format}')
 i18n.set('file_format', 'yml')
 i18n.set('skip_locale_root_data', True)
 i18n.set('fallback', 'en')
-i18n.set('available_locales', ['en', 'ru'])
+i18n.set('available_locales', ['en', 'ru', 'uz'])
 
 LANGUAGE_INFO = {
     'en': {'display': 'English', 'code': 'EN-US'},
     'ru': {'display': 'Русский', 'code': 'RU-RU'},
+    'uz': {'display': 'O\'zbek', 'code': 'UZ-UZ'},
 }
 
 

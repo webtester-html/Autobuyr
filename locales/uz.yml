@@ -1,0 +1,45 @@
+errors:
+  missing_config: |
+    Majburiy Sozlamalar Yo'q
+    {}
+
+    Iltimos, hujjatlarni tekshiring yoki yordam uchun @bohd4nx bilan bog'laning.
+    Batafsil ma'lumot uchun https://github.com/bohd4nx/Gifts-Buyer/blob/master/README.md saytini tashrif buyuring.
+
+telegram:
+  start_message: |
+    <b>✅ Gifts Buyer Muvaffaqiyatli Ishga Tushirildi</b>
+    <b>Tanlangan til:</b> <code>%{language}</code>
+    <b>Sizning joriy balansingiz:</b> <code>%{balance} ⭐</code>
+
+    <b>📝 Sovg'a sotib olish mantiqi:</b>
+    <blockquote>Sizning sozlamalaringizga ko'ra:
+    • <b>%{min_price}-%{max_price} ⭐</b> narx oralig'idagi sovg'alar sotib olinadi
+    • Har bir mos sovg'a <b>%{quantity}x</b> marta yuboriladi</blockquote>
+
+    <i>💡 Belgilangan mezonlardan tashqaridagi sovg'alar avtomatik ravishda o'tkazib yuboriladi</i>
+  peer_id_error: |
+    <b>❗Sovg'a yuborishda xatolik yuz berdi!</b>
+    Iltimos, chat initsializatsiyasi muvaffaqiyatli o'tganligini 
+    va siz avval bu foydalanuvchi bilan aloqada bo'lganingizni tekshiring.
+  error_message: "<b>❗Sovg'a sotib olishda xatolik yuz berdi!</b>\n\n<pre>%{error}</pre>"
+  balance_error: "<b>🎁 Sovg'a</b> [<code>%{gift_id}</code>] yetarli balans yo'qligi sababli yuborilmadi!\n\n<b>Talab qilinadi:</b> <code>%{gift_price} ⭐</code>\n<b>Balans:</b> <code>%{current_balance} ⭐</code>"
+  gift_price: "<b>🎁 Sovg'a</b> [<code>%{gift_id}</code>] foydalanuvchi ko'rsatilgan sozlamalariga mos kelmaydi\n\nNarx: <b>%{price} ⭐%{supply_text}</b>. O'tkazib yuborilmoqda..."
+  success_message: "<b>🎁 Sovg'a (%{current}/%{total}):</b> [<code>%{gift_id}</code>] muvaffaqiyatli yuborildi!\n\n<b>Qabul qiluvchi:%{recipient}</b>"
+  sold_out_summary: "<b>⚠️ %{count} ta sotilgan sovg'alar o'tkazib yuborildi</b>"
+  non_limited_summary: "<b>⚠️ %{count} ta cheklanmagan sovg'alar o'tkazib yuborildi</b>"
+  non_upgradable_summary: "<b>⚠️ %{count} ta yaxshilab bo'lmaydigan sovg'alar o'tkazib yuborildi</b>"
+  available: "Mavjud"
+
+console:
+  low_balance: "Sovg'a yuborish uchun yetarli yulduz balansi yo'q!"
+  gift_send_error: "Sovg'ani yuborishda xatolik: %{gift_id} foydalanuvchiga: %{chat_id}"
+  gift_checking: "Yangi sovg'alarni tekshirish"
+  new_gifts: "Yangi sovg'alar topildi:"
+  purchase_error: "Sovg'a sotib olishda xatolik %{gift_id} foydalanuvchi uchun: %{chat_id}"
+  terminated: "Dastur yakunlandi"
+  unexpected_error: "Kutilmagan xatolik yuz berdi:"
+  gift_sent: "Sovg'a (%{current}/%{total}): %{gift_id} muvaffaqiyatli yuborildi %{recipient}"
+  sold_out_gifts_summary: "%{count} ta sotilgan sovg'alar o'tkazib yuborildi"
+  non_limited_gifts_summary: "%{count} ta cheklanmagan sovg'alar o'tkazib yuborildi"
+  non_upgradable_gifts_summary: "%{count} ta yaxshilab bo'lmaydigan sovg'alar o'tkazib yuborildi" 
