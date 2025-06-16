@@ -114,13 +114,17 @@ class NotificationManager:
         Sends or updates a pinned message with current lookup time.
         Limited by STATUS_UPDATE_INTERVAL to avoid over-editing.
         """
+
+        if not config.CHANNEL_ID:
+            return
+
         current_time = datetime.now()
         now_ts = current_time.timestamp()
 
         if now_ts - NotificationManager._status_message_last_edit_time < config.STATUS_UPDATE_INTERVAL:
             return  # too earlier
 
-        text = f"🔄 {t('console.gift_checking')}... ({current_time.strftime("%H:%M:%S")})"
+        text = f"🔄 {t('console.gift_checking')}... ({current_time.strftime("%d.%m %H:%M:%S")})"
 
         try:
             chat = await app.get_chat(config.CHANNEL_ID)
