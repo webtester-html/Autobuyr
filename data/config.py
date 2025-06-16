@@ -34,6 +34,8 @@ class Config:
 
         self.INTERVAL = self.parser.getfloat('Bot', 'INTERVAL', fallback=15.0)
         self.LANGUAGE = self.parser.get('Bot', 'LANGUAGE', fallback='EN').lower()
+        self.HEARTBEAT_MONITOR_URL = self.parser.get('Bot', 'HEARTBEAT_MONITOR_URL', fallback=None)
+        self.STATUS_UPDATE_INTERVAL = self.parser.get('Bot', 'STATUS_UPDATE_INTERVAL', fallback=30)
 
         self.GIFT_RANGES = self._parse_gift_ranges()
         self.PURCHASE_ONLY_UPGRADABLE_GIFTS = self.parser.getboolean('Gifts', 'PURCHASE_ONLY_UPGRADABLE_GIFTS',

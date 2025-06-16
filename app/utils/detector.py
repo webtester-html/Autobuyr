@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from pyrogram import Client, types
 
-from app.notifications import send_summary_message
+from app.notifications import send_summary_message, send_or_update_status_message, send_heartbeat_ping
 from app.utils.logger import log_same_line, info
 from data.config import config, t
 
@@ -78,6 +78,15 @@ class GiftMonitor:
             new_gifts and await GiftMonitor._process_new_gifts(app, new_gifts, gift_ids, callback)
 
             await GiftDetector.save_gift_history(list(current_gifts.values()))
+
+            # if a heartbeat URL is configured, send a request from a background thread
+            # to indicate that the detection gifts lookup is alive, without blocking the main event loop.
+            if config.HEARTBEAT_MONITOR_URL:
+                asyncio.create_task(asyncio.to_thread(send_heartbeat_ping))
+            # Send or update a pinned status message in the channel to reflect current lookup time.
+            # Keeps a single visible status message up-to-date for each scan cycle.
+            asyncio.create_task(send_or_update_status_message(app))
+
             await asyncio.sleep(config.INTERVAL)
 
     @staticmethod

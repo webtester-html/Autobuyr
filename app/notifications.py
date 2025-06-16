@@ -1,3 +1,6 @@
+from datetime import datetime
+import urllib.request
+
 from pyrogram import Client
 from pyrogram.errors import RPCError
 
@@ -7,6 +10,9 @@ from data.config import config, t
 
 
 class NotificationManager:
+    # Timestamp of the last pinned status message edit to avoid Telegram FloodWait
+    _status_message_last_edit_time = 0
+
     @staticmethod
     async def send_message(app: Client, message: str) -> None:
         if not config.CHANNEL_ID:
@@ -47,6 +53,18 @@ class NotificationManager:
             value and key in message_types and await NotificationManager._send_with_error_handling(
                 app, message_types[key]().strip())
 
+
+    @staticmethod
+    async def unpin_all_messages(app: Client) -> None:
+        """Unpins all pinned messages in the configured channel."""
+        if not config.CHANNEL_ID:
+            return
+        try:
+            await app.unpin_all_chat_messages(config.CHANNEL_ID)
+        except RPCError as ex:
+            error(f"Failed to unpin messages in channel {config.CHANNEL_ID}: {ex}")
+
+
     @staticmethod
     async def _send_with_error_handling(app: Client, message: str) -> None:
         try:
@@ -56,6 +74,7 @@ class NotificationManager:
 
     @staticmethod
     async def send_start_message(client: Client) -> None:
+        await NotificationManager.unpin_all_messages(client)
         balance = await get_user_balance(client)
         ranges_text = "\n".join([
             f"• {r['min_price']}-{r['max_price']} ⭐ (supply ≤ {r['supply_limit']}) x{r['quantity']} -> {len(r['recipients'])} recipients"
@@ -89,7 +108,57 @@ class NotificationManager:
             app, t("telegram.skip_summary_header") + "\n" + "\n".join(summary_parts))
 
 
+    @staticmethod
+    async def send_or_update_status_message(app: Client) -> None:
+        """
+        Sends or updates a pinned message with current lookup time.
+        Limited by STATUS_UPDATE_INTERVAL to avoid over-editing.
+        """
+
+        if not config.CHANNEL_ID:
+            return
+
+        current_time = datetime.now()
+        now_ts = current_time.timestamp()
+
+        if now_ts - NotificationManager._status_message_last_edit_time < config.STATUS_UPDATE_INTERVAL:
+            return  # too earlier
+
+        text = f"🔄 {t('console.gift_checking')}... ({current_time.strftime("%d.%m %H:%M:%S")})"
+
+        try:
+            chat = await app.get_chat(config.CHANNEL_ID)
+            pinned = chat.pinned_message
+
+            if pinned:
+                await app.edit_message_text(config.CHANNEL_ID, pinned.id, text)
+            else:
+                msg = await app.send_message(config.CHANNEL_ID, text)
+                await app.pin_chat_message(config.CHANNEL_ID, msg.id, disable_notification=True)
+
+            NotificationManager._status_message_last_edit_time = now_ts
+
+        except RPCError as ex:
+            error(f"Failed to send or update pinned status message: {ex}")
+
+    @staticmethod
+    def send_heartbeat_ping() -> None:
+        """
+        Sends a heartbeat ping to the configured monitoring URL (if set).
+        Runs synchronously — use with asyncio.to_thread().
+        """
+        if not config.HEARTBEAT_MONITOR_URL:
+            return
+
+        try:
+            urllib.request.urlopen(config.HEARTBEAT_MONITOR_URL, timeout=2)
+        except Exception as e:
+            error(f"Heartbeat failed: {e}")
+
+
 send_message = NotificationManager.send_message
 send_notification = NotificationManager.send_notification
 send_start_message = NotificationManager.send_start_message
 send_summary_message = NotificationManager.send_summary_message
+send_or_update_status_message = NotificationManager.send_or_update_status_message
+send_heartbeat_ping = NotificationManager.send_heartbeat_ping

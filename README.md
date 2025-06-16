@@ -14,6 +14,8 @@ management.
 - **👥 Multi-Recipient**: Send different quantities to multiple users/channels per price range
 - **💰 Balance Management**: Makes partial purchases when balance is insufficient
 - **📊 Detailed Notifications**: Purchase confirmations, balance alerts, and processing summaries
+- **📌 Live Status Updates**: Automatically pins and updates a message with the latest scan time (UTC)
+- **❤️‍🩹 Heartbeat Support**: Optional external ping for uptime monitoring
 - **🔧 Flexible Setup**: Simple configuration format for price ranges and recipients
 - **🌍 Multi-Language**: English and Russian interface
 
@@ -88,6 +90,25 @@ PURCHASE_ONLY_UPGRADABLE_GIFTS = False # Buy only upgradable gifts
 PRIORITIZE_LOW_SUPPLY = True           # Prioritize rare gifts
 ```
 
+### Advanced Settings
+
+```ini
+[Bot]
+INTERVAL = 10                          # Check interval in seconds
+LANGUAGE = EN                          # Interface language (EN/RU)
+HEARTBEAT_MONITOR_URL = https://your-monitor-url.example/ping  # Optional
+STATUS_UPDATE_INTERVAL = XX            # Optional: only set manually if needed. Default = 30 sec
+```
+
+- `HEARTBEAT_MONITOR_URL`: If set, the bot will send an HTTP request to this URL on every scan cycle. Useful for external monitoring services like healthchecks.io, self-hosted UptimeKuma, or custom endpoints.
+  - ⚠️ **Use with care**: Only specify URLs you fully control or trust. Avoid random websites or services that could block or reject requests — this may result in connection errors.
+  - 🌐 Format: a direct, accessible URL (e.g., `https://your-monitor-url.example/ping`) with no authentication or redirects.
+  - ✅ Example: `https://your-monitor-url.example/api/v1/heartbeat/abc123`
+
+> ⚙️ `STATUS_UPDATE_INTERVAL` is an internal cooldown (in seconds) to avoid too frequent message edits Telegram messages.
+> Changing it is **not recommended** unless you know what you’re doing — editing too often may lead to Telegram FloodWait bans.
+> It can be manually added to `config.ini` if needed.  
+
 ### Gift Ranges Format
 
 **Format**: multiple ranges separated by `;`  
@@ -127,6 +148,34 @@ Example:
 - Result: Buys 3 copies, reports missing 1500⭐ for the last one
 ```
 
+## 🔄 How the Status Message Works
+
+On each gift detection cycle, the bot:
+
+1. Checks if enough time has passed since the last status update (STATUS_UPDATE_INTERVAL, default 30 seconds)
+2. If a pinned status message exists in the channel, it updates the message text
+3. If not, it sends a new message and pins it
+
+📍 Only **one pinned message** is maintained in the channel. On startup, the bot unpins all previously pinned messages to keep this under control.
+
+Example status message:
+
+```
+🔄 Checking for new gifts... (16.06 12:42:18)
+```
+> 🕘 Time shown in UTC.
+
+## 🫀 How Heartbeat Monitoring Works
+
+If `HEARTBEAT_MONITOR_URL` is configured:
+
+- The bot will send a simple HTTP request to that URL on every detection gifts lookup
+- It indicates that the bot is running and the gift search loop is active
+- The ping is sent asynchronously and does not block gift processing
+- If the request fails, an error is logged (e.g. `Heartbeat failed`), but the bot will continue running
+
+---
+
 ## 📝 Tips
 
 - Keep balance 2-3x higher than your most expensive range
@@ -134,7 +183,9 @@ Example:
 - Enable notifications to monitor activity
 - Test with small ranges first
 - Run on VPS for 24/7 operation
-
+- Use `HEARTBEAT_MONITOR_URL` for additional uptime monitoring
+- Avoid untrusted URLs in heartbeat setting — failed pings will create log noise
+- Pinned status message shows live scan time and updates automatically
 ---
 
 <div align="center">
