@@ -16,6 +16,7 @@ app_info = get_app_info()
 class Application:
     @staticmethod
     async def run() -> None:
+        print("SHIZUOKA UKRAL ETO PERVIM")
         set_window_title(app_info)
         display_title(app_info, get_language_display(config.LANGUAGE))
 
