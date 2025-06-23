@@ -5,8 +5,7 @@ from app.errors import handle_gift_error
 from app.notifications import send_notification
 from app.utils.helper import get_recipient_info, get_user_balance
 from app.utils.logger import info, warn
-from data.config import t
-
+from data.config import t, config
 
 class GiftPurchaser:
     @staticmethod
@@ -39,7 +38,7 @@ class GiftPurchaser:
         for i in range(quantity):
             current_gift = i + 1
             try:
-                await app.send_gift(chat_id=chat_id, gift_id=gift_id, hide_my_name=True)
+                await app.send_gift(chat_id=chat_id, gift_id=gift_id, hide_my_name=config.HIDE_SENDER_NAME)
                 info(t("console.gift_sent", current=current_gift, total=quantity,
                           gift_id=gift_id, recipient=recipient_info))
                 await send_notification(app, gift_id, user_id=chat_id, username=username,

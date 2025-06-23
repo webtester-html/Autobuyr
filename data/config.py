@@ -34,6 +34,7 @@ class Config:
 
         self.INTERVAL = self.parser.getfloat('Bot', 'INTERVAL', fallback=15.0)
         self.LANGUAGE = self.parser.get('Bot', 'LANGUAGE', fallback='EN').lower()
+        self.HIDE_SENDER_NAME = self.parser.getboolean('Bot', 'HIDE_SENDER_NAME', fallback=True)
 
         self.GIFT_RANGES = self._parse_gift_ranges()
         self.PURCHASE_ONLY_UPGRADABLE_GIFTS = self.parser.getboolean('Gifts', 'PURCHASE_ONLY_UPGRADABLE_GIFTS',
