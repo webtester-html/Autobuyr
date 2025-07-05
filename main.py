@@ -12,10 +12,12 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import i18n
 import pyfiglet
 import yaml
+from data.config import config, t
 from aiohttp import web
 from pyrogram import Client, filters, idle
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import raw
 
 # Настройка логирования
 logger = logging.getLogger("gifts_buyer")
@@ -713,7 +715,7 @@ async def start_command(client, message):
     except Exception as e:
         error(f"Ошибка при обработке /start для {user_id}: {e}")
         await message.reply_text("Ошибка при выполнении команды. Попробуйте позже.")
-
+        
 # Обработчик команды /cancel
 @app.on_message(filters.command("cancel") & filters.private)
 async def cancel_command(client, message):
@@ -756,7 +758,7 @@ async def refund_command(client, message):
     except Exception as e:
         error(f"Ошибка при обработке /refund для {user_id}: {e}")
         await message.reply_text("Ошибка при выполнении команды. Попробуйте позже.")
-
+        
 # Обработчик callback-запросов
 @app.on_callback_query()
 async def handle_callback(client, callback_query):
@@ -795,7 +797,7 @@ async def handle_callback(client, callback_query):
     except Exception as e:
         error(f"Ошибка при обработке callback для {user_id}: {e}")
         await callback_query.message.edit_text("Ошибка при обработке. Попробуйте позже.")
-
+        
 class Application:
     @staticmethod
     async def run() -> None:
