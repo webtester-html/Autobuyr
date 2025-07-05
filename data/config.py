@@ -64,7 +64,7 @@ class Config:
         ranges_str = self.parser.get('Gifts', 'GIFT_RANGES', fallback='')
         ranges = []
 
-        for range_item in ranges_str.split(';'):
+        for range_item in ranges_str.split('|'):
             range_item = range_item.strip()
             range_item and ranges.append(self._parse_single_range(range_item))
 

@@ -90,7 +90,7 @@ PRIORITIZE_LOW_SUPPLY = True           # Prioritize rare gifts
 
 ### Gift Ranges Format
 
-**Format**: multiple ranges separated by `;`  
+**Format**: multiple ranges separated by `|`  
 Each range: `min_price-max_price: supply_limit x quantity: recipients`
 
 **Examples**:
@@ -100,7 +100,7 @@ Each range: `min_price-max_price: supply_limit x quantity: recipients`
 - `5001-50000: 50000 x 5: 987654321` - Expensive gifts, 5 copies
 
 **As a result**:  
-`GIFT_RANGES = 1-1000: 500000 x 1: @johndoe, 123456789; 1001-5000: 100000 x 2: @channel, @user; 5001-50000: 50000 x 5: 987654321`
+`GIFT_RANGES = 1-1000: 500000 x 1: @johndoe, 123456789; 1001-5000: 100000 x 2: @channel, @user | 5001-50000: 50000 x 5: 987654321`
 
 **Recipients can be**:
 
