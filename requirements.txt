@@ -1,7 +1,8 @@
 pyfiglet==1.0.2
-pyrogram==2.0.106  # Заменяем pyrofork на pyrogram
-tgcrypto==1.2.5    # Заменяем tgcrypto-pyrofork
+pyrogram==2.0.106
+tgcrypto==1.2.5
 configparser==7.2.0
 python-i18n==0.3.9
 PyYAML==6.0.2
 python-dotenv==1.0.1
+aiohttp==3.9.5  # Для refund, если используешь HTTP-запрос
