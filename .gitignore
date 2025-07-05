@@ -4,5 +4,4 @@ __pycache__/
 env/
 venv/
 .idea/
-data/account.session
 config.ini
