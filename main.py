@@ -2,7 +2,7 @@ import asyncio
 import traceback
 import configparser
 import logging
-from pyrofork import Client  # Используем pyrofork вместо pyrogram
+from pyrogram import Client  # Используем pyrogram вместо pyrofork
 
 # Настройка логирования для отладки
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -34,12 +34,12 @@ except Exception as e:
     logging.error(f"Ошибка при чтении параметров из config.ini: {e}")
     raise
 
-# Заглушка для отсутствующих модулей (замени на свои реализации)
+# Заглушка для отсутствующих модулей
 def display_title(app_info, language): logging.info(f"Заглушка: display_title({app_info}, {language})")
 def get_app_info(): return {"name": "GiftBot", "version": "1.0"}
 def set_window_title(app_info): logging.info(f"Заглушка: set_window_title({app_info})")
 async def send_start_message(client): 
-    await client.send_message("me", "Бот запущен!")
+    await client.send_message("me", "Бот запущен на Render!")
     logging.info("Тестовое сообщение отправлено в 'Saved Messages'")
 async def gift_monitoring(client, callback): 
     logging.info("Заглушка: gift_monitoring запущен")
