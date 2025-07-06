@@ -12,7 +12,7 @@ import traceback
 import i18n
 import pyfiglet
 import yaml
-from data.config import config, t
+from data.config import config, t, get_language_display
 from aiohttp import web
 from app.core.banner import get_app_info
 from pyrogram import Client, filters, idle
