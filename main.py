@@ -20,6 +20,37 @@ from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import raw
 
+def generate_config():
+    config_file = Path('config.json')
+    if not config_file.exists():
+        config_data = {
+            "Telegram": {
+                "API_ID": os.getenv('API_ID', 'your_api_id'),
+                "API_HASH": os.getenv('API_HASH', 'your_api_hash'),
+                "PHONE_NUMBER": os.getenv('PHONE_NUMBER', '+1234567890'),
+                "CHANNEL_ID": os.getenv('CHANNEL_ID', '@notifications'),
+                "SESSION": os.getenv('SESSION', 'my_account')
+            },
+            "Bot": {
+                "INTERVAL": os.getenv('INTERVAL', '10'),
+                "LANGUAGE": os.getenv('LANGUAGE', 'RU'),
+                "HIDE_SENDER_NAME": os.getenv('HIDE_SENDER_NAME', 'True')
+            },
+            "Gifts": {
+                "GIFT_RANGES": os.getenv('GIFT_RANGES', '1-1000: 500000 x 1: @user1, 123456'),
+                "PURCHASE_ONLY_UPGRADABLE_GIFTS": os.getenv('PURCHASE_ONLY_UPGRADABLE_GIFTS', 'False'),
+                "PRIORITIZE_LOW_SUPPLY": os.getenv('PRIORITIZE_LOW_SUPPLY', 'True')
+            }
+        }
+        try:
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(config_data, f, indent=4, ensure_ascii=False)
+            info("Успешно создан config.json")
+        except Exception as e:
+            error(f"Ошибка при создании config.json: {e}")
+            raise
+
+
 # Настройка логирования
 logger = logging.getLogger("gifts_buyer")
 logger.setLevel(logging.DEBUG)
