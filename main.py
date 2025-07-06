@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import sys
+import psycopg2
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import traceback
@@ -895,54 +896,59 @@ class Application:
             except Exception as e:
                 error(f"Ошибка при открытии сессии: {e}")
                 save_auth_status("unknown", "failed", str(e))
-                raise
-        else:
-            info("Файл сессии не найден, создается новая сессия")
-            try:
-                async with Client(
-                    name="my_account",
-                    api_id=config.API_ID,
-                    api_hash=config.API_HASH,
-                    phone_number=config.PHONE_NUMBER
-                ) as app:
-                    try:
-                        # Add handler for auth code
-                        app.add_handler(MessageHandler(handle_auth_code))
-                        result = await app.send_code(config.PHONE_NUMBER)
-                        phone_code_hash = result.phone_code_hash
-                        me = await app.get_me()
-                        user_id = me.id
-                        await app.send_message("me", f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ответьте в этот чат с кодом (например, 12345).")
-                        info(f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ожидание ответа в личных сообщениях.")
-                        for _ in range(120):  # Wait up to 10 minutes
-                            if auth_code:
-                                await app.sign_in(config.PHONE_NUMBER, phone_code_hash, auth_code)
-                                break
-                            await asyncio.sleep(5)
-                        else:
-                            await app.send_message("me", "Код авторизации не получен в течение 10 минут.")
-                            raise Exception("Код авторизации не получен в течение 10 минут")
-                        me = await app.get_me()
-                        info(f"Авторизован как {me.username}")
-                        save_auth_status(me.username, "success")
-                        await app.send_message("me", f"Авторизация успешна: {me.username}")
-                        await send_start_message(app)
-                        asyncio.create_task(start_http_server())
-                        asyncio.create_task(gift_monitoring(app, process_gift))
-                        await idle()
-                    except (PhoneCodeInvalid, PhoneCodeExpired) as e:
-                        error(f"Неверный или истекший код авторизации: {e}")
-                        save_auth_status("unknown", "failed", str(e))
-                        await app.send_message("me", f"Ошибка: Неверный или истекший код. Попробуйте снова.")
-                        raise
-                    except Exception as e:
-                        error(f"Ошибка при авторизации: {e}")
-                        save_auth_status("unknown", "failed", str(e))
-                        await app.send_message("me", f"Ошибка авторизации: {e}")
-                        raise
-            except Exception as e:
-                error(f"Ошибка при создании новой сессии: {e}")
-                raise
+                # Попробуем создать новую сессию, если текущая недействительна
+                try:
+                    os.remove(session_path)
+                    info(f"Удален недействительный файл сессии: {session_path}")
+                except Exception as e:
+                    error(f"Ошибка при удалении файла сессии: {e}")
+        # Создание новой сессии
+        info("Создается новая сессия")
+        try:
+            async with Client(
+                name="my_account",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                phone_number=config.PHONE_NUMBER
+            ) as app:
+                try:
+                    # Добавляем обработчик для кода авторизации
+                    app.add_handler(MessageHandler(handle_auth_code))
+                    result = await app.send_code(config.PHONE_NUMBER)
+                    phone_code_hash = result.phone_code_hash
+                    me = await app.get_me()
+                    user_id = me.id
+                    await app.send_message("me", f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ответьте в этот чат с кодом (например, 12345).")
+                    info(f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ожидание ответа в личных сообщениях.")
+                    for _ in range(120):  # Ожидание до 10 минут
+                        if auth_code:
+                            await app.sign_in(config.PHONE_NUMBER, phone_code_hash, auth_code)
+                            break
+                        await asyncio.sleep(5)
+                    else:
+                        await app.send_message("me", "Код авторизации не получен в течение 10 минут.")
+                        raise Exception("Код авторизации не получен в течение 10 минут")
+                    me = await app.get_me()
+                    info(f"Авторизован как {me.username}")
+                    save_auth_status(me.username, "success")
+                    await app.send_message("me", f"Авторизация успешна: {me.username}")
+                    await send_start_message(app)
+                    asyncio.create_task(start_http_server())
+                    asyncio.create_task(gift_monitoring(app, process_gift))
+                    await idle()
+                except (PhoneCodeInvalid, PhoneCodeExpired) as e:
+                    error(f"Неверный или истекший код авторизации: {e}")
+                    save_auth_status("unknown", "failed", str(e))
+                    await app.send_message("me", f"Ошибка: Неверный или истекший код. Попробуйте снова.")
+                    raise
+                except Exception as e:
+                    error(f"Ошибка при авторизации: {e}")
+                    save_auth_status("unknown", "failed", str(e))
+                    await app.send_message("me", f"Ошибка авторизации: {e}")
+                    raise
+        except Exception as e:
+            error(f"Ошибка при создании новой сессии: {e}")
+            raise
 
     @staticmethod
     def main() -> None:
