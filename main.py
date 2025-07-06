@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
+import traceback
 import i18n
 import pyfiglet
 import yaml
