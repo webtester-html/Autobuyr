@@ -834,30 +834,29 @@ async def handle_callback(client, callback_query):
 class Application:
     @staticmethod
     async def run() -> None:
-        set_window_title(app_info)
-        display_title(app_info, get_language_display(config.LANGUAGE))
-        session_path = Path('/etc/secrets/my_account.session')
+        session_path = Path('/data/account/my_account.session')  # путь к сессии в /data
+
         if session_path.exists():
             info(f"Используется файл сессии: {session_path}")
             async with Client(
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
-                name=str(session_path)
+                name=str(session_path)  # Pyrogram автоматически добавит .session, если нужно
             ) as app:
                 try:
                     me = await app.get_me()
                     info(f"Авторизован как {me.username}")
                     await send_start_message(app)
-                    asyncio.create_task(start_http_server())  # HTTP-сервер для пингера
-                    asyncio.create_task(gift_monitoring(app, process_gift))  # Мониторинг подарков
-                    await idle()  # Держит бота активным 24/7
+                    asyncio.create_task(start_http_server())  # HTTP-сервер
+                    asyncio.create_task(gift_monitoring(app, process_gift))
+                    await idle()
                 except Exception as e:
                     error(f"Ошибка при выполнении: {e}")
                     raise
         else:
             info("Файл сессии не найден, создается новая сессия")
             async with Client(
-                name=config.SESSION,
+                name='/data/my_account',  # здесь путь без расширения, Pyrogram создаст .session
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
                 phone_number=config.PHONE_NUMBER
@@ -866,9 +865,9 @@ class Application:
                     me = await app.get_me()
                     info(f"Авторизован как {me.username}")
                     await send_start_message(app)
-                    asyncio.create_task(start_http_server())  # HTTP-сервер для пингера
-                    asyncio.create_task(gift_monitoring(app, process_gift))  # Мониторинг подарков
-                    await idle()  # Держит бота активным 24/7
+                    asyncio.create_task(start_http_server())
+                    asyncio.create_task(gift_monitoring(app, process_gift))
+                    await idle()
                 except Exception as e:
                     error(f"Ошибка при выполнении: {e}")
                     raise
@@ -882,7 +881,6 @@ class Application:
         except Exception as e:
             error(f"Непредвиденная ошибка: {e}")
             traceback.print_exc()
-            
 
 if __name__ == "__main__":
     Application.main()
