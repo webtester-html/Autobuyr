@@ -9,7 +9,6 @@ from app.notifications import send_summary_message
 from app.utils.logger import log_same_line, info
 from data.config import config, t
 
-
 class GiftDetector:
     @staticmethod
     async def load_gift_history() -> Dict[int, dict]:
@@ -26,12 +25,20 @@ class GiftDetector:
 
     @staticmethod
     async def fetch_current_gifts(app: Client) -> Tuple[Dict[int, dict], List[int]]:
-        gifts = [
-            json.loads(json.dumps(gift, default=types.Object.default, ensure_ascii=False))
-            for gift in await app.get_available_gifts()
-        ]
-        gifts_dict = {gift["id"]: gift for gift in gifts}
-        return gifts_dict, list(gifts_dict.keys())
+        try:
+            if hasattr(app, 'get_available_gifts'):
+                gifts = [
+                    json.loads(json.dumps(gift, default=types.Object.default, ensure_ascii=False))
+                    for gift in await app.get_available_gifts()
+                ]
+                gifts_dict = {gift["id"]: gift for gift in gifts}
+                return gifts_dict, list(gifts_dict.keys())
+            else:
+                info("Метод get_available_gifts отсутствует, возвращаем пустые данные")
+                return {}, []  # Return empty data to avoid crash
+        except Exception as e:
+            info(f"Ошибка в fetch_current_gifts: {e}")
+            return {}, []
 
     @staticmethod
     def categorize_skipped_gifts(gift_data: Dict[str, Any]) -> Dict[str, int]:
@@ -53,7 +60,6 @@ class GiftDetector:
             x[1].get("total_amount", float('inf')) if x[1].get("is_limited", False) else float('inf'),
             x[1]["position"]
         )) if config.PRIORITIZE_LOW_SUPPLY else sorted_gifts
-
 
 class GiftMonitor:
     @staticmethod
@@ -104,6 +110,5 @@ class GiftMonitor:
                                              sold_out=skip_counts['sold_out_count'],
                                              non_limited=skip_counts['non_limited_count'],
                                              non_upgradable=skip_counts['non_upgradable_count']))
-
 
 gift_monitoring = GiftMonitor.run_detection_loop
