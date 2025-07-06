@@ -14,7 +14,7 @@ import pyfiglet
 import yaml
 from data.config import config, t
 from aiohttp import web
-from app.utils.detector import get_app_info
+from app.core.banner import get_app_info
 from pyrogram import Client, filters, idle
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
