@@ -809,10 +809,9 @@ class Application:
         if session_path.exists():
             info(f"Используется файл сессии: {session_path}")
             async with Client(
-                name=config.SESSION,
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
-                session_file=str(session_path)
+                name=str(session_path)
             ) as app:
                 try:
                     me = await app.get_me()
