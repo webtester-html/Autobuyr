@@ -18,7 +18,7 @@ from aiohttp import web
 from app.core.banner import get_app_info
 from pyrogram import Client, filters, idle
 from pyrogram.errors import FloodWait, RPCError
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from pyrogram import raw
 
 phone_code_hash = None
