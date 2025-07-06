@@ -836,7 +836,7 @@ class Application:
     async def run() -> None:
         set_window_title(app_info)
         display_title(app_info, get_language_display(config.LANGUAGE))
-        session_path = Path('/opt/render/project/src/data/account/gifts_session.session')
+        session_path = Path('/etc/secrets/my_account.session')
         if session_path.exists():
             info(f"Используется файл сессии: {session_path}")
             async with Client(
