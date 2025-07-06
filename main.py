@@ -62,6 +62,7 @@ warn = LoggerInterface.warn
 error = LoggerInterface.error
 log_same_line = LoggerInterface.log_same_line
 
+app_info = get_app_info()
 # Локализация
 LOCALES_DIR = Path(__file__).parent / 'locales'
 LANGUAGE_MAP = {
