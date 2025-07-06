@@ -801,19 +801,45 @@ async def handle_callback(client, callback_query):
 class Application:
     @staticmethod
     async def run() -> None:
-        set_window_title(get_app_info())
-        display_title(get_app_info(), config.language_display)
-        async with app:
-            try:
-                me = await app.get_me()
-                info(f"Авторизован как {me.username}")
-                await send_start_message(app)
-                asyncio.create_task(start_http_server())  # HTTP-сервер для пингера
-                asyncio.create_task(gift_monitoring(app, process_gift))  # Мониторинг подарков
-                await idle()  # Держит бота активным 24/7
-            except Exception as e:
-                error(f"Ошибка при выполнении: {e}")
-                raise
+        set_window_title(app_info)
+        display_title(app_info, get_language_display(config.LANGUAGE))
+        session_path = Path('/etc/secrets/my_account.session')
+        if session_path.exists():
+            info(f"Используется файл сессии: {session_path}")
+            async with Client(
+                name=config.SESSION,
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_file=str(session_path)
+            ) as app:
+                try:
+                    me = await app.get_me()
+                    info(f"Авторизован как {me.username}")
+                    await send_start_message(app)
+                    asyncio.create_task(start_http_server())  # HTTP-сервер для пингера
+                    asyncio.create_task(gift_monitoring(app, process_gift))  # Мониторинг подарков
+                    await idle()  # Держит бота активным 24/7
+                except Exception as e:
+                    error(f"Ошибка при выполнении: {e}")
+                    raise
+        else:
+            info("Файл сессии не найден, создается новая сессия")
+            async with Client(
+                name=config.SESSION,
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                phone_number=config.PHONE_NUMBER
+            ) as app:
+                try:
+                    me = await app.get_me()
+                    info(f"Авторизован как {me.username}")
+                    await send_start_message(app)
+                    asyncio.create_task(start_http_server())  # HTTP-сервер для пингера
+                    asyncio.create_task(gift_monitoring(app, process_gift))  # Мониторинг подарков
+                    await idle()  # Держит бота активным 24/7
+                except Exception as e:
+                    error(f"Ошибка при выполнении: {e}")
+                    raise
 
     @staticmethod
     def main() -> None:
@@ -824,6 +850,7 @@ class Application:
         except Exception as e:
             error(f"Непредвиденная ошибка: {e}")
             traceback.print_exc()
+            
 
 if __name__ == "__main__":
     Application.main()
