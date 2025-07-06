@@ -20,6 +20,39 @@ from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import raw
 
+phone_code_hash = None
+auth_code = None
+user_id = None
+
+# Save auth status to PostgreSQL
+def save_auth_status(username, status, error_message=None):
+    try:
+        conn = psycopg2.connect(
+            dbname="autobuy_blea",
+            user="autobuy_blea_user",
+            password="bGE09Vl1a32tSFLvIi4V2carPKTSos1e",
+            host="dpg-d1l4lvfdiees73f71cpg-a.oregon-postgres.render.com",
+            port="5432"
+        )
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO auth_log (username, status, error_message) VALUES (%s, %s, %s)",
+            (username, status, error_message)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        info(f"Статус авторизации сохранен: {username}, {status}")
+    except Exception as e:
+        error(f"Ошибка при сохранении статуса авторизации в PostgreSQL: {e}")
+
+# Handler for receiving auth code in private messages
+async def handle_auth_code(client: Client, message: Message):
+    global auth_code, user_id
+    if message.from_user and message.from_user.id == user_id and message.text:
+        auth_code = message.text.strip()
+        info(f"Получен код авторизации: {auth_code}")
+        
 def generate_config():
     config_file = Path('config.json')
     if not config_file.exists():
@@ -834,43 +867,81 @@ async def handle_callback(client, callback_query):
 class Application:
     @staticmethod
     async def run() -> None:
-        session_path = Path('/data/account/my_account.session')  # путь к сессии в /data
+        global phone_code_hash, auth_code, user_id
+        session_path = Path('/opt/render/project/src/data/account/my_account.session')
+        os.makedirs('/opt/render/project/src/data/account', exist_ok=True)
 
         if session_path.exists():
             info(f"Используется файл сессии: {session_path}")
-            async with Client(
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                name=str(session_path)  # Pyrogram автоматически добавит .session, если нужно
-            ) as app:
-                try:
-                    me = await app.get_me()
-                    info(f"Авторизован как {me.username}")
-                    await send_start_message(app)
-                    asyncio.create_task(start_http_server())  # HTTP-сервер
-                    asyncio.create_task(gift_monitoring(app, process_gift))
-                    await idle()
-                except Exception as e:
-                    error(f"Ошибка при выполнении: {e}")
-                    raise
+            try:
+                async with Client(
+                    name=str(session_path),
+                    api_id=config.API_ID,
+                    api_hash=config.API_HASH
+                ) as app:
+                    try:
+                        me = await app.get_me()
+                        info(f"Авторизован как {me.username}")
+                        save_auth_status(me.username, "success")
+                        await send_start_message(app)
+                        asyncio.create_task(start_http_server())
+                        asyncio.create_task(gift_monitoring(app, process_gift))
+                        await idle()
+                    except Exception as e:
+                        error(f"Ошибка при выполнении: {e}")
+                        save_auth_status("unknown", "failed", str(e))
+                        raise
+            except Exception as e:
+                error(f"Ошибка при открытии сессии: {e}")
+                save_auth_status("unknown", "failed", str(e))
+                raise
         else:
             info("Файл сессии не найден, создается новая сессия")
-            async with Client(
-                name='/data/my_account',  # здесь путь без расширения, Pyrogram создаст .session
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                phone_number=config.PHONE_NUMBER
-            ) as app:
-                try:
-                    me = await app.get_me()
-                    info(f"Авторизован как {me.username}")
-                    await send_start_message(app)
-                    asyncio.create_task(start_http_server())
-                    asyncio.create_task(gift_monitoring(app, process_gift))
-                    await idle()
-                except Exception as e:
-                    error(f"Ошибка при выполнении: {e}")
-                    raise
+            try:
+                async with Client(
+                    name="my_account",
+                    api_id=config.API_ID,
+                    api_hash=config.API_HASH,
+                    phone_number=config.PHONE_NUMBER
+                ) as app:
+                    try:
+                        # Add handler for auth code
+                        app.add_handler(MessageHandler(handle_auth_code))
+                        result = await app.send_code(config.PHONE_NUMBER)
+                        phone_code_hash = result.phone_code_hash
+                        me = await app.get_me()
+                        user_id = me.id
+                        await app.send_message("me", f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ответьте в этот чат с кодом (например, 12345).")
+                        info(f"Код авторизации отправлен на {config.PHONE_NUMBER}. Ожидание ответа в личных сообщениях.")
+                        for _ in range(120):  # Wait up to 10 minutes
+                            if auth_code:
+                                await app.sign_in(config.PHONE_NUMBER, phone_code_hash, auth_code)
+                                break
+                            await asyncio.sleep(5)
+                        else:
+                            await app.send_message("me", "Код авторизации не получен в течение 10 минут.")
+                            raise Exception("Код авторизации не получен в течение 10 минут")
+                        me = await app.get_me()
+                        info(f"Авторизован как {me.username}")
+                        save_auth_status(me.username, "success")
+                        await app.send_message("me", f"Авторизация успешна: {me.username}")
+                        await send_start_message(app)
+                        asyncio.create_task(start_http_server())
+                        asyncio.create_task(gift_monitoring(app, process_gift))
+                        await idle()
+                    except (PhoneCodeInvalid, PhoneCodeExpired) as e:
+                        error(f"Неверный или истекший код авторизации: {e}")
+                        save_auth_status("unknown", "failed", str(e))
+                        await app.send_message("me", f"Ошибка: Неверный или истекший код. Попробуйте снова.")
+                        raise
+                    except Exception as e:
+                        error(f"Ошибка при авторизации: {e}")
+                        save_auth_status("unknown", "failed", str(e))
+                        await app.send_message("me", f"Ошибка авторизации: {e}")
+                        raise
+            except Exception as e:
+                error(f"Ошибка при создании новой сессии: {e}")
+                raise
 
     @staticmethod
     def main() -> None:
@@ -881,6 +952,6 @@ class Application:
         except Exception as e:
             error(f"Непредвиденная ошибка: {e}")
             traceback.print_exc()
-
+            
 if __name__ == "__main__":
     Application.main()
