@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import sys
-import psycopg2
+import psycopg
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import traceback
